@@ -4,8 +4,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-// Cache thực đơn 5 phút để giảm tải DB
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   try {
