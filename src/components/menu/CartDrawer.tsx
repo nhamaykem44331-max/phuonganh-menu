@@ -274,21 +274,29 @@ export function CartDrawer() {
                   </div>
 
                   {items.length > 0 && (
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 mt-2">
                        <button
                          onClick={handleBooking}
-                         className="flex-[2] bg-[#4d3722] hover:bg-navy text-[#C9A84C] py-2.5 uppercase tracking-widest font-semibold text-[10px] transition-all flex items-center justify-center gap-1 rounded-sm shadow-md"
+                         className="w-full bg-[#4d3722] hover:bg-navy text-[#C9A84C] py-2.5 uppercase tracking-widest font-semibold text-[10px] transition-all flex items-center justify-center gap-1 rounded-sm shadow-md"
                        >
                          Xác Nhận Đặt Bàn <ChevronRight size={12} />
                        </button>
-                       <button
-                          onClick={() => {
-                             alert("Mẹo chụp màn hình:\nBấm phím nguồn + giảm âm lượng (hoặc PrtSc trên máy tính).\nẢnh này được tối ưu giống y hệt tờ Menu in của nhà hàng.");
-                          }}
-                          className="flex-[1] py-2.5 text-[9px] uppercase tracking-wider font-semibold text-[#4d3722] border border-[#4d3722]/20 hover:bg-[#4d3722]/5 transition-colors flex items-center justify-center gap-1.5 rounded-sm"
-                       >
-                          📸 Chụp Bộ Ảnh
-                       </button>
+                       <div className="flex gap-2">
+                          <button
+                             onClick={() => { closeCart(); window.location.href='/bao-gia?guests=10'; }}
+                             className="flex-[1] py-2 text-[9px] uppercase tracking-wider font-semibold text-white bg-[#4d3722]/90 hover:bg-navy transition-colors flex items-center justify-center gap-1.5 rounded-sm min-h-[36px]"
+                          >
+                             📋 Xem Báo Giá
+                          </button>
+                          <button
+                             onClick={() => {
+                                alert("Mẹo chụp màn hình:\nBấm phím nguồn + giảm âm lượng (hoặc PrtSc trên máy tính).\nẢnh này được tối ưu giống y hệt tờ Menu in của nhà hàng.");
+                             }}
+                             className="flex-[1] py-2 text-[9px] uppercase tracking-wider font-semibold text-[#4d3722] border border-[#4d3722]/20 hover:bg-[#4d3722]/5 transition-colors flex items-center justify-center gap-1.5 rounded-sm min-h-[36px]"
+                          >
+                             📸 Chụp Ảnh
+                          </button>
+                       </div>
                     </div>
                   )}
                 </div>

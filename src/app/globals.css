@@ -217,3 +217,18 @@
   border-left: 3px solid rgb(var(--navy));
   border-radius: 0 6px 6px 0;
 }
+
+/* =============================================
+   PRINT STYLES FOR QUOTATION PAGE (/bao-gia)
+============================================= */
+@media print {
+  body * { visibility: hidden; }
+  #bao-gia-paper, #bao-gia-paper * { visibility: visible; }
+  #bao-gia-paper { 
+    position: absolute; left: 0; top: 0;
+    width: 210mm; 
+    margin: 0;
+    padding: 0;
+  }
+  .no-print { display: none !important; }
+}
