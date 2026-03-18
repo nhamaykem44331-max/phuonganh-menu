@@ -105,7 +105,7 @@ export function CartDrawer() {
               </button>
 
               {/* Header Box */}
-              <div className="flex flex-col items-center pt-5 pb-1 px-4 relative z-10">
+              <div className="flex flex-col items-center pt-3 pb-1 px-4 relative z-10">
                 <div className="flex flex-col items-center mb-2 text-[#4d3722]">
                   {/* Decorative Logo */}
                   <div className="relative w-8 h-8 border-[1.5px] border-[#4d3722] flex items-center justify-center rotate-45 mb-2 shadow-[0_0_15px_rgba(201,168,76,0.15)] bg-[#FAF8F5]">
@@ -148,20 +148,20 @@ export function CartDrawer() {
                           exit={{ opacity: 0, height: 0 }}
                           className="flex flex-col relative group py-0 mt-0 sm:py-0.5"
                         >
-                          <div className="flex justify-between items-baseline w-full gap-2 mt-1">
+                          <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
                             <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
                               <span className="text-[6px] text-[#4d3722]/40 flex-shrink-0 relative -top-[2px]">⚫</span>
-                              <p className="font-display font-bold text-[#4d3722] uppercase tracking-[0.03em] text-[13px] sm:text-[14.5px] leading-tight break-words">
+                              <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
                                 {item.name}
                                 {item.quantity > 1 && (
-                                  <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[12px]">
+                                  <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[11px]">
                                     (x{item.quantity})
                                   </span>
                                 )}
                               </p>
                               <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
                             </div>
-                            <p className="font-body font-extrabold text-[#4d3722] text-[14px] sm:text-[15.5px] flex-shrink-0 tracking-wide leading-tight">
+                            <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
                               {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
                             </p>
                           </div>
@@ -193,7 +193,7 @@ export function CartDrawer() {
                           )}
 
                           {/* Action Controls (Discreet - safe to screenshot) */}
-                          <div className="flex items-center gap-[12px] ml-[14px] mt-0.5 mb-1 opacity-20 group-hover:opacity-100 focus-within:opacity-100 focus-within:flex transition-opacity h-4">
+                          <div className="flex items-center gap-[12px] ml-[14px] mt-0 mb-0.5 opacity-20 group-hover:opacity-100 focus-within:opacity-100 focus-within:flex transition-opacity h-3">
                              <div className="flex items-center gap-1.5">
                                 <button onClick={() => updateQuantity(item.menuItemId, item.quantity - 1)} className="text-lg leading-none text-[#4d3722] hover:text-[#C9A84C]">−</button>
                                 <span className="font-mono text-[9px] font-bold text-[#4d3722] w-2 text-center relative top-[0.5px]">{item.quantity}</span>
@@ -211,22 +211,22 @@ export function CartDrawer() {
               </div>
 
               {/* Footer Section */}
-              <div className="px-4 sm:px-10 mt-auto pt-1 pb-4 shrink-0 relative z-10 w-full">
+              <div className="px-4 sm:px-10 mt-auto pt-1 pb-2 shrink-0 relative z-10 w-full">
                 {items.length > 0 && (
                   <>
                     {/* Total Amount */}
-                    <div className="flex justify-between items-baseline border-t-2 border-[#4d3722] pt-4 mt-2">
-                      <span className="font-display font-extrabold text-[#4d3722] text-[15px] sm:text-[16px] uppercase tracking-wide">
+                    <div className="flex justify-between items-baseline border-t-2 border-[#4d3722] pt-2 mt-1">
+                      <span className="font-display font-extrabold text-[#4d3722] text-[13px] sm:text-[15px] uppercase tracking-tight">
                         Tổng Cộng
                       </span>
-                      <span className="font-display font-black text-[#CA2026] text-[24px] sm:text-[28px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] leading-none tracking-tight">
+                      <span className="font-display font-black text-[#CA2026] text-[20px] sm:text-[24px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] leading-none tracking-tight">
                         {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(totalPrice)}
                       </span>
                     </div>
 
                     {/* Contact Info (For Screenshot) */}
-                    <div className="mt-8 mb-4 flex flex-col items-center">
-                      <p className="font-display font-bold italic text-[#4d3722]/90 text-[14px] sm:text-[15px] mb-2.5 tracking-wide">Chúc Quý khách ngon miệng</p>
+                    <div className="mt-3 mb-2 flex flex-col items-center">
+                      <p className="font-display font-bold italic text-[#4d3722]/90 text-[13px] sm:text-[14px] mb-1.5 tracking-wide">Chúc Quý khách ngon miệng</p>
                       <div className="flex items-center justify-center gap-6 text-[11px] sm:text-[13px] font-body text-[#4d3722] font-semibold tracking-wide flex-wrap">
                          <span className="flex items-center gap-1.5">
                             <Phone size={13} className="stroke-[2.5px]" /> 
