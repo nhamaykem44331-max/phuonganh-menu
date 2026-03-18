@@ -1,0 +1,219 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =============================================
+   DESIGN SYSTEM - Nhà hàng Phương Anh (Luxury 5-Star)
+   Aesthetic: Luxury Fine Dining
+   Primary: Deep Midnight Navy + Warm Gold
+   Font: Cormorant Garamond (headings) + Lora (body) + Inter (ui)
+============================================= */
+
+@layer base {
+  :root {
+    /* Brand Colors */
+    --navy:        10 15 30;     /* #0A0F1E — Deep Midnight Navy */
+    --gold:        201 168 76;   /* #C9A84C — Warm Gold */
+    --ivory:       250 247 242;  /* #FAF7F2 — Ivory White */
+    --charcoal:    26 26 26;     /* #1A1A1A — Charcoal */
+    --muted-gold:  212 186 114;  /* #D4BA72 — Muted Gold */
+    
+    --border:      225 215 200;  /* #e1d7c8 */
+
+    /* Semantic tokens */
+    --background:  var(--ivory);
+    --foreground:  var(--charcoal);
+    --card:        255 255 255;
+    --primary:     var(--navy);
+    --primary-fg:  255 255 255;
+    --accent:      var(--gold);
+    --accent-fg:   255 255 255;
+
+    /* shadcn/ui compatibility */
+    --radius: 0.375rem; /* 6px */
+  }
+
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    font-family: 'Lora', serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: rgb(var(--background));
+    color: rgb(var(--foreground));
+    font-size: 15px;
+    line-height: 1.7;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+}
+
+@layer utilities {
+  /* Navy utilities */
+  .bg-navy        { background-color: rgb(var(--navy)); }
+  .text-navy      { color: rgb(var(--navy)); }
+  .border-navy    { border-color: rgb(var(--navy)); }
+
+  /* Gold utilities */
+  .bg-gold        { background-color: rgb(var(--gold)); }
+  .text-gold      { color: rgb(var(--gold)); }
+  .border-gold    { border-color: rgb(var(--gold)); }
+
+  /* Ivory */
+  .bg-ivory       { background-color: rgb(var(--ivory)); }
+
+  /* Typography */
+  .font-display   { font-family: 'Cormorant Garamond', serif; }
+  .font-body      { font-family: 'Lora', serif; }
+  .font-ui        { font-family: 'Inter', sans-serif; }
+
+  /* Card hover lift - Luxury soft shadow */
+  .card-lift {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .card-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -8px rgba(10, 15, 30, 0.08); /* Subtle luxury shadow */
+  }
+
+  /* Price tag */
+  .price-tag {
+    font-family: 'Lora', serif;
+    font-weight: 600;
+    color: rgb(var(--gold));
+  }
+
+  /* Subtle grain / linen overlay */
+  .grain::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.025'/%3E%3C/svg%3E");
+    pointer-events: none;
+    border-radius: inherit;
+    z-index: 0;
+  }
+
+  /* Scrollbar custom thanh lịch */
+  .scrollbar-thin::-webkit-scrollbar { width: 3px; height: 3px; }
+  .scrollbar-thin::-webkit-scrollbar-track { background: transparent; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: rgba(201, 168, 76, 0.5); border-radius: 99px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: rgba(201, 168, 76, 0.8); }
+}
+
+/* =============================================
+   CART DRAWER TRANSITION (Framer Motion augment)
+============================================= */
+.cart-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(10, 15, 30, 0.4);
+}
+
+/* =============================================
+   CATEGORY TABS (Underline style)
+============================================= */
+.cat-tab {
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.875rem;
+  position: relative;
+  color: rgba(26, 26, 26, 0.6);
+  padding: 0.5rem 0;
+  margin: 0 1rem;
+  font-family: 'Inter', sans-serif;
+}
+.cat-tab:hover {
+  color: rgb(var(--charcoal));
+}
+.cat-tab.active {
+  color: rgb(var(--gold));
+}
+.cat-tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: rgb(var(--gold));
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+/* =============================================
+   MENU CARD IMAGE ZOOM
+============================================= */
+.menu-img-wrap {
+  overflow: hidden;
+  border-radius: 6px 6px 0 0;
+  position: relative;
+}
+.menu-img-wrap::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 40%;
+  background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+  pointer-events: none;
+}
+.menu-img-wrap img {
+  transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.menu-img-wrap:hover img {
+  transform: scale(1.04);
+}
+
+/* =============================================
+   BADGE (Inter Text)
+============================================= */
+.luxury-badge {
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgb(var(--gold));
+}
+
+/* =============================================
+   ADMIN SIDEBAR
+============================================= */
+.admin-nav-link {
+  transition: all 0.2s ease;
+  border-radius: 6px;
+  font-family: 'Inter', sans-serif;
+}
+.admin-nav-link:hover,
+.admin-nav-link.active {
+  background: rgba(10, 15, 30, 0.05);
+  color: rgb(var(--navy));
+}
+.admin-nav-link.active {
+  font-weight: 500;
+  border-left: 3px solid rgb(var(--navy));
+  border-radius: 0 6px 6px 0;
+}
