@@ -8,7 +8,11 @@ import Link from "next/link";
 import { Phone, ArrowLeft, Camera, Printer, Loader2, X } from "lucide-react";
 
 function formatPrice(price: number) {
-  return new Intl.NumberFormat("vi-VN").format(price);
+  return new Intl.NumberFormat("vi-VN", {
+    style: "currency",
+    currency: "VND",
+    maximumFractionDigits: 0,
+  }).format(price).replace("₫", "đ");
 }
 
 // ============== CUSTOM HOOK: useFoodSearch ==============
@@ -22,7 +26,6 @@ const useFoodSearch = (query: string) => {
       return; 
     }
     
-    // 300ms debounce
     const timer = setTimeout(async () => {
       setLoading(true);
       try {
@@ -108,13 +111,13 @@ function AutocompleteInput({
         }}
         onFocus={() => setShowDropdown(true)}
         onKeyDown={handleKeyDown}
-        className="w-full h-full border border-[#C9A84C]/50 px-3 py-2 text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
+        className="w-full h-full border border-[#C9A84C]/50 px-3 py-2 text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722] rounded-sm"
       />
       
       {showDropdown && value.length >= 2 && (
-        <div className="absolute z-[100] top-[100%] left-0 right-0 mt-1 bg-white border border-[#C9A84C]/30 shadow-xl max-h-[300px] overflow-y-auto">
+        <div className="absolute z-[100] top-[100%] left-0 right-0 mt-1 bg-white border border-[#C9A84C]/30 shadow-xl max-h-[300px] overflow-y-auto rounded-sm">
           {loading ? (
-            <div className="flex items-center gap-2 p-3 text-[12px] text-[#4d3722]/60 italic font-ui">
+            <div className="flex items-center gap-2 p-3 text-[12px] text-[#4d3722]/60 italic font-body">
               <Loader2 size={14} className="animate-spin" /> Đang tìm...
             </div>
           ) : results.length > 0 ? (
@@ -129,16 +132,16 @@ function AutocompleteInput({
                 >
                   <div className="flex justify-between items-start">
                     <span className="font-bold text-[#4d3722] text-[13px] font-display">{item.name}</span>
-                    <span className="text-[10px] uppercase text-[#4d3722]/50 font-ui tracking-wider">{item.category?.name || "Món ăn"}</span>
+                    <span className="text-[10px] uppercase text-[#4d3722]/50 font-body tracking-wider">{item.category?.name || "Món ăn"}</span>
                   </div>
-                  <div className="text-[11px] font-ui text-[#C9A84C] font-semibold mt-0.5">
-                    {formatPrice(item.price)}đ
+                  <div className="text-[11px] font-body text-[#C9A84C] font-semibold mt-0.5">
+                    {formatPrice(item.price)}
                   </div>
                 </li>
               ))}
             </ul>
           ) : (
-            <div className="p-3 text-[12px] text-[#4d3722]/60 italic font-ui">
+            <div className="p-3 text-[12px] text-[#4d3722]/60 italic font-body">
               Không tìm thấy món — nhập thủ công vẫn được
             </div>
           )}
@@ -197,13 +200,6 @@ function BaoGiaContent() {
     );
   }
 
-  const categorized = cartItems.reduce((acc, item) => {
-    const cat = (item as any).category || "MÓN ĐÃ CHỌN";
-    if (!acc[cat]) acc[cat] = [];
-    acc[cat].push(item);
-    return acc;
-  }, {} as Record<string, typeof cartItems>);
-
   const handleCapture = async () => {
     if (!paperRef.current) return;
     try {
@@ -251,135 +247,145 @@ function BaoGiaContent() {
   const finalTotal = getCartTotal() + totalExtraPrice;
 
   return (
-    <div className="min-h-screen bg-[#FAF8F5] py-8 flex flex-col items-center scrollbar-thin">
+    <div className="min-h-screen bg-gray-50/50 py-4 sm:py-8 flex flex-col items-center px-2 sm:px-4">
       <Script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" strategy="lazyOnload" />
       
-      {/* Paper Container */}
+      {/* BAO GIA PAPER EXACTLY MATCHING CART DRAWER UI */}
       <div 
         id="bao-gia-paper"
         ref={paperRef}
-        className="bg-white border-[2px] border-[#C9A84C] relative shadow-2xl mx-auto flex flex-col pt-10 pb-10 px-12"
-        style={{
-          width: "100%", maxWidth: "595px", // A4 width at 72dpi
-          minHeight: "842px", // A4 height 
-          color: "#1a1a1a",
-          boxSizing: "border-box"
-        }}
+        className="w-full max-w-[600px] flex flex-col m-1 sm:m-2 border-[3px] border-double border-[#C9A84C]/60 relative bg-[#FAF8F5] overflow-visible pb-3"
       >
-        <div className="absolute inset-0 border-[2px] border-[#C9A84C] pointer-events-none" style={{ margin: "2px" }} />
+        {/* Corner ornaments */}
+        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#C9A84C]/60 -mt-[1px] -ml-[1px]" />
+        <div className="absolute top-0 right-0 w-6 h-6 border-t-2 border-r-2 border-[#C9A84C]/60 -mt-[1px] -mr-[1px]" />
+        <div className="absolute bottom-0 left-0 w-6 h-6 border-b-2 border-l-2 border-[#C9A84C]/60 -mb-[1px] -ml-[1px]" />
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-[#C9A84C]/60 -mb-[1px] -mr-[1px]" />
 
-        {/* Header */}
-        <div className="flex flex-col items-center mb-6 mt-2">
-          <svg width="60" height="60" viewBox="0 0 100 100" className="mb-2">
-             <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="#FAF8F5" stroke="#4d3722" strokeWidth="2"/>
-             <path d="M50 4 L96 50 L50 96 L4 50 Z" fill="none" stroke="#4d3722" strokeWidth="1" opacity="0.5"/>
-             <text x="50" y="56" fontFamily="Cormorant Garamond" fontSize="28" fontWeight="bold" fill="#4d3722" textAnchor="middle">PA</text>
-          </svg>
-          <div className="font-display font-bold uppercase tracking-[0.3em] text-[#4d3722]" style={{ fontSize: "18px", lineHeight: "1" }}>PHƯƠNG ANH</div>
-          <div className="uppercase tracking-[0.3em] font-medium text-[#4d3722]/60" style={{ fontSize: "10px", marginTop: "4px" }}>HOTEL & RESTAURANT</div>
+        {/* Header Box */}
+        <div className="flex flex-col items-center pt-3 pb-1 px-4 relative z-10">
+          <div className="flex flex-col items-center mb-2 text-[#4d3722]">
+            {/* Decorative Logo */}
+            <div className="relative w-8 h-8 border-[1.5px] border-[#4d3722] flex items-center justify-center rotate-45 mb-2 shadow-[0_0_15px_rgba(201,168,76,0.15)] bg-[#FAF8F5]">
+              <div className="absolute inset-0.5 border border-[#4d3722]/50" />
+              <span className="-rotate-45 font-display text-[15px] font-bold tracking-tighter">PA</span>
+            </div>
+            <p className="font-display font-bold uppercase tracking-[0.2em] text-[12px] leading-none">Phương Anh</p>
+            <p className="text-[7.5px] uppercase tracking-[0.3em] opacity-80 mt-1 font-medium leading-none">Hotel & Restaurant</p>
+          </div>
           
-          <div className="w-full flex items-center justify-center mt-6 mb-2 relative px-4">
-             <div className="flex-1 h-px bg-[#C9A84C]" />
-             <h2 className="px-6 font-display font-bold text-[#C9A84C] tracking-[0.1em] uppercase whitespace-nowrap" style={{ fontSize: "16px" }}>
+          <div className="w-full flex items-center justify-center my-1 relative px-2">
+             <div className="flex-1 h-px bg-[#4d3722]/20" />
+             <h2 className="px-5 font-display font-extrabold text-[15px] sm:text-[17px] text-[#C9A84C] tracking-[0.15em] drop-shadow-sm whitespace-nowrap title-shadow-gold text-center leading-normal">
                 {titleParam ? titleParam : "THỰC ĐƠN BÁO GIÁ"}
              </h2>
-             <div className="flex-1 h-px bg-[#C9A84C]" />
+             <div className="flex-1 h-px bg-[#4d3722]/20" />
+          </div>
+          
+          <div className="flex justify-between w-full mt-1.5 px-0 sm:px-2 font-display italic text-[11px] text-[#4d3722] font-bold">
+            <span>Ngày lập: {dateString}</span>
+            <span>Số khách: {guests}</span>
           </div>
         </div>
 
-        {/* Info row */}
-        <div className="flex justify-between w-full mb-6 font-ui" style={{ fontSize: "11px", color: "#666" }}>
-          <div>Ngày lập: {dateString}</div>
-          <div>Số khách: {guests}</div>
+        {/* Content List */}
+        <div className="flex-1 flex flex-col px-4 sm:px-10 pt-1 relative z-10">
+           <ul className="flex-1 flex flex-col gap-0 pb-2">
+              {cartItems.map((item) => (
+                 <li key={item.menuItemId} className="flex flex-col relative group py-0 mt-0 sm:py-0.5">
+                    <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
+                      <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
+                        <span className="text-[6px] text-[#4d3722]/40 flex-shrink-0 relative -top-[2px]">⚫</span>
+                        <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
+                          {item.name}
+                          {item.quantity > 1 && (
+                            <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[11px]">
+                              (x{item.quantity})
+                            </span>
+                          )}
+                        </p>
+                        <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
+                      </div>
+                      <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
+                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
+                      </p>
+                    </div>
+                 </li>
+              ))}
+
+              {extraItems.map((item) => (
+                 <li key={item.id} className="flex flex-col relative group py-0 mt-0 sm:py-0.5 pr-5">
+                    <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
+                      <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
+                        <span className="text-[9px] text-[#C9A84C] flex-shrink-0 relative -top-[1.5px]">✏️</span>
+                        <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
+                          {item.name}
+                          {item.quantity > 1 && (
+                            <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[11px]">
+                              (x{item.quantity})
+                            </span>
+                          )}
+                        </p>
+                        <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
+                      </div>
+                      <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
+                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
+                      </p>
+                    </div>
+                    {/* Delete Icon (No print) */}
+                    <button 
+                      onClick={() => removeExtraItem(item.id)}
+                      className="no-print absolute right-0 top-1/2 -translate-y-1/2 text-red-500/30 hover:text-red-500 transition-colors p-1"
+                      title="Xoá món này"
+                    >
+                      <X size={11} strokeWidth={2.5} />
+                    </button>
+                 </li>
+              ))}
+           </ul>
         </div>
 
-        {/* Items Container */}
-        <div className="flex-1 w-full flex flex-col gap-5">
-           
-           {/* Cart Items Mapping */}
-           {Object.keys(categorized).map((catName) => (
-             <div key={catName} className="flex flex-col">
-                <div className="w-full text-center font-display font-bold text-[#C9A84C] uppercase tracking-[0.15em] mb-2" style={{ fontSize: "10px" }}>
-                   ── {catName} ──
-                </div>
-                <div className="flex flex-col">
-                  {categorized[catName].map((item: any) => (
-                    <div key={item.menuItemId} className="flex justify-between items-end border-b border-dashed border-[#e8e0d0] relative group" style={{ padding: "5px 0", fontSize: "12px", lineHeight: "1.3" }}>
-                       <div className="flex items-baseline pr-4 w-[60%]" style={{ fontFamily: "Cormorant Garamond" }}>
-                          <span className="mr-2 text-[#C9A84C]" style={{ fontSize: "8px", verticalAlign: "middle" }}>•</span>
-                          <span className="font-bold text-[#4d3722] uppercase tracking-wide truncate">{item.name}</span>
-                       </div>
-                       <div className="font-ui text-right whitespace-nowrap flex-1" style={{ color: "#4d3722" }}>
-                          {item.quantity} × {formatPrice(item.price)} = <span className="font-semibold">{formatPrice(item.price * item.quantity)}</span>
-                       </div>
-                    </div>
-                  ))}
-                </div>
-             </div>
-           ))}
+        {/* Footer Section */}
+        <div className="px-4 sm:px-10 mt-1 pt-1 pb-2 shrink-0 relative z-10 w-full">
+           {/* Total Amount */}
+           <div className="flex justify-between items-baseline border-t-2 border-[#4d3722] pt-2 mt-1">
+              <span className="font-display font-extrabold text-[#4d3722] text-[13px] sm:text-[15px] uppercase tracking-tight">
+                 Tổng Cộng
+              </span>
+              <span className="font-display font-black text-[#CA2026] text-[20px] sm:text-[24px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] leading-none tracking-tight">
+                 {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(finalTotal)}
+              </span>
+           </div>
 
-           {/* Manually Added Items */}
-           {extraItems.length > 0 && (
-             <div className="flex flex-col mt-2">
-                <div className="w-full text-center font-display font-bold text-[#C9A84C] uppercase tracking-[0.15em] mb-2" style={{ fontSize: "10px" }}>
-                   ── MÓN YÊU CẦU THÊM ──
-                </div>
-                <div className="flex flex-col">
-                  {extraItems.map((item) => (
-                    <div key={item.id} className="flex justify-between items-end border-b border-dashed border-[#e8e0d0] relative group pr-6" style={{ padding: "5px 0", fontSize: "12px", lineHeight: "1.3" }}>
-                       <div className="flex items-baseline pr-4 w-[60%] relative" style={{ fontFamily: "Cormorant Garamond" }}>
-                          <span className="mr-1.5 text-[#C9A84C]" style={{ fontSize: "8px", verticalAlign: "middle" }}>✏️</span>
-                          <span className="font-bold text-[#4d3722] uppercase tracking-wide truncate">{item.name}</span>
-                       </div>
-                       <div className="font-ui text-right whitespace-nowrap flex-1" style={{ color: "#4d3722" }}>
-                          {item.quantity} × {formatPrice(item.price)} = <span className="font-semibold">{formatPrice(item.price * item.quantity)}</span>
-                       </div>
-                       {/* Delete Button (No-print) */}
-                       <button 
-                         onClick={() => removeExtraItem(item.id)}
-                         className="no-print absolute right-0 top-1/2 -translate-y-1/2 text-red-500/30 hover:text-red-600 transition-colors p-1 opacity-0 group-hover:opacity-100"
-                         title="Xoá món này"
-                       >
-                         <X size={12} strokeWidth={3} />
-                       </button>
-                    </div>
-                  ))}
-                </div>
+           {/* Note (optional) */}
+           {noteParam && (
+             <div className="w-full mt-2 font-display italic text-[#4d3722]/80 leading-tight text-center" style={{ fontSize: "11px" }}>
+                Ghi chú: {noteParam}
              </div>
            )}
 
-        </div>
-
-        {/* Note (optional) */}
-        {noteParam && (
-           <div className="w-full mt-4 font-body italic" style={{ fontSize: "12px", color: "#666" }}>
-              Ghi chú: {noteParam}
-           </div>
-        )}
-
-        {/* Footer Sum */}
-        <div className="w-full mt-8 pt-4 border-t border-[#C9A84C] flex flex-col items-end">
-           <div className="flex justify-end items-baseline w-full mt-2">
-              <span className="font-display font-bold text-[#4d3722] uppercase mr-4" style={{ fontSize: "16px" }}>TỔNG CỘNG:</span>
-              <span className="font-ui font-bold text-[#C9A84C]" style={{ fontSize: "18px" }}>{formatPrice(finalTotal)} VNĐ</span>
-           </div>
-           <div className="font-ui italic mt-1" style={{ fontSize: "10px", color: "#888" }}>*Giá đã bao gồm VAT</div>
-        </div>
-
-        {/* Contact info */}
-        <div className="w-full mt-10 mb-2 flex flex-col items-center">
-           <div className="font-display font-bold italic text-[#4d3722] mb-3" style={{ fontSize: "14px" }}>Chúc Quý khách ngon miệng</div>
-           <div className="flex items-center gap-6 font-ui font-semibold text-[#4d3722]" style={{ fontSize: "10px" }}>
-              <span className="flex items-center gap-1.5"><Phone size={10} strokeWidth={2.5}/> Zalo: 0839.881.881</span>
-              <span className="flex items-center gap-1.5"><Phone size={10} strokeWidth={2.5}/> Lễ tân: 0208.656.9999</span>
+           {/* Contact info */}
+           <div className="mt-3 mb-1 flex flex-col items-center">
+              <p className="font-display font-bold italic text-[#4d3722]/90 text-[13px] sm:text-[14px] mb-1.5 tracking-wide">Chúc Quý khách ngon miệng</p>
+              <div className="flex items-center justify-center gap-6 text-[11px] sm:text-[13px] font-body text-[#4d3722] font-semibold tracking-wide flex-wrap">
+                 <span className="flex items-center gap-1.5">
+                    <Phone size={13} className="stroke-[2.5px]" /> 
+                    Zalo: 0839.881.881
+                 </span>
+                 <span className="flex items-center gap-1.5">
+                    <Phone size={13} className="stroke-[2.5px]" /> 
+                    Lễ tân: 0208.656.9999
+                 </span>
+              </div>
            </div>
         </div>
       </div>
+      {/* END BAO GIA PAPER */}
 
       {/* MANUALLY ADD ITEM FORM (NO PRINT) */}
-      <div className="no-print w-full max-w-[595px] mt-8 px-4 font-ui">
+      <div className="no-print w-full max-w-[600px] mt-6 px-1">
         <label className="block text-[11px] font-semibold text-[#4d3722] uppercase tracking-wider mb-2">Thêm món vào báo giá:</label>
-        <div className="flex gap-2 items-stretch h-[36px]">
+        <div className="flex gap-1.5 sm:gap-2 items-stretch h-[36px]">
           <div className="flex-1 bg-white relative">
             <AutocompleteInput 
                value={inputName}
@@ -391,33 +397,33 @@ function BaoGiaContent() {
                }}
             />
           </div>
-          <div className="w-[60px] relative">
+          <div className="w-[50px] sm:w-[60px] relative">
             <input 
               ref={quantityInputRef}
               type="number" 
               min={1} 
               value={inputQuantity}
               onChange={(e) => setInputQuantity(Number(e.target.value))}
-              className="w-full h-full border border-[#C9A84C]/50 px-2 text-center text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
+              className="w-full h-full border border-[#C9A84C]/50 px-1 sm:px-2 rounded-sm text-center text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
               title="Số lượng"
             />
           </div>
-          <div className="w-[120px] relative">
+          <div className="w-[90px] sm:w-[120px] relative">
             <input 
               type="number" 
-              placeholder="Giá (VD: 550000)" 
+              placeholder="Giá..." 
               value={inputPrice}
               onChange={(e) => setInputPrice(Number(e.target.value))}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleAddExtraItem();
               }}
-              className="w-full h-full border border-[#C9A84C]/50 px-3 py-2 text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
+              className="w-full h-full border border-[#C9A84C]/50 px-2 py-2 rounded-sm text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
               title="Đơn giá"
             />
           </div>
           <button 
             onClick={handleAddExtraItem}
-            className="bg-[#4d3722] hover:bg-navy text-[#C9A84C] font-semibold tracking-widest uppercase text-[11px] px-5 flex items-center justify-center transition-colors"
+            className="bg-[#4d3722] hover:bg-navy text-[#C9A84C] font-semibold tracking-widest uppercase text-[10px] sm:text-[11px] px-3 sm:px-5 flex items-center justify-center rounded-sm transition-colors shrink-0"
           >
             THÊM
           </button>
@@ -425,7 +431,7 @@ function BaoGiaContent() {
       </div>
 
       {/* ACTION BUTTONS (NO PRINT) */}
-      <div className="no-print w-full max-w-[595px] flex justify-between gap-3 mt-4 px-4">
+      <div className="no-print w-full max-w-[600px] flex justify-between gap-3 mt-4 px-1">
          <button onClick={handleCapture} className="flex-[2] bg-[#4d3722] hover:bg-navy text-[#C9A84C] py-3 uppercase tracking-wider font-semibold text-[11px] flex items-center justify-center gap-2 rounded-sm shadow-md transition-colors">
             <Camera size={14} /> Chụp Ảnh
          </button>
@@ -433,8 +439,8 @@ function BaoGiaContent() {
             <Printer size={14} /> In / PDF
          </button>
       </div>
-      <div className="no-print mt-6 mb-10">
-         <Link href="/" className="text-[#4d3722]/60 hover:text-[#4d3722] font-ui text-[12px] flex items-center gap-1 border-b border-transparent hover:border-[#4d3722] pb-0.5 transition-all">
+      <div className="no-print mt-6 mb-10 w-full max-w-[600px] px-1">
+         <Link href="/" className="text-[#4d3722]/60 hover:text-[#4d3722] font-body text-[12px] flex items-center gap-1 w-fit transition-all">
             <ArrowLeft size={12} /> Quay lại thực đơn
          </Link>
       </div>
