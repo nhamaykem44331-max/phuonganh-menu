@@ -270,9 +270,10 @@ function CalendarView({
     byDay[d].push(b);
   });
 
-  const cells = Array.from({ length: firstDay }, () => null).concat(
-    Array.from({ length: daysInMonth }, (_, i) => i + 1)
-  );
+  const cells = [
+    ...Array.from({ length: firstDay }, () => null as null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ] as (number | null)[];
 
   const today = new Date();
   const isToday = (d: number) =>
