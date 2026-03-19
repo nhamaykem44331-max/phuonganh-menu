@@ -186,20 +186,6 @@ function BaoGiaContent() {
 
   const totalItemsCount = cartItems.length + extraItems.length;
 
-  if (totalItemsCount === 0) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4 bg-[#FAF8F5]">
-        <p className="font-display text-xl text-[#4d3722] mb-4">Chưa có món nào được chọn</p>
-        <Link 
-          href="/" 
-          className="flex items-center gap-2 px-6 py-3 bg-[#4d3722] text-[#C9A84C] uppercase tracking-wider font-semibold text-sm rounded-sm"
-        >
-          <ArrowLeft size={16} /> Quay lại chọn món
-        </Link>
-      </div>
-    );
-  }
-
   const handleCapture = async () => {
     if (!paperRef.current) return;
     try {
