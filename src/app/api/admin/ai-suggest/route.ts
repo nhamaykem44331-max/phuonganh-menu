@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-3-opus-20240229", // Fix model name string
+        model: "claude-3-haiku-20240307", // Đổi sang Haiku cho nhẹ, nhanh và tránh lỗi giới hạn Opus
         max_tokens: 500,
         messages: [
           {
@@ -49,7 +49,10 @@ Hãy trả về JSON hợp lệ (không có text thừa, không markdown, chỉ 
        throw new Error(claudeData?.error?.message || "Lỗi khi gọi Claude API");
     }
 
-    const rawText = claudeData.content?.[0]?.text ?? "{}";
+    let rawText = claudeData.content?.[0]?.text ?? "{}";
+    
+    // Xoá markdown wrapper nếu Claude vẫn trả về
+    rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
     
     let aiResult: {
       nameEn: string;
@@ -60,7 +63,8 @@ Hãy trả về JSON hợp lệ (không có text thừa, không markdown, chỉ 
     
     try {
       aiResult = JSON.parse(rawText);
-    } catch {
+    } catch (parseError) {
+      console.error("Lỗi parse JSON:", parseError, rawText);
       // Fallback nếu parse lỗi
       aiResult = {
         nameEn: "",
@@ -95,7 +99,7 @@ Hãy trả về JSON hợp lệ (không có text thừa, không markdown, chỉ 
   } catch (error) {
     console.error("[AI Suggest]", error);
     return NextResponse.json(
-      { error: "Lỗi AI, vui lòng thử lại" },
+      { error: error instanceof Error ? error.message : "Lỗi AI, vui lòng thử lại" },
       { status: 500 }
     );
   }
