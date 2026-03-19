@@ -282,19 +282,18 @@ function BaoGiaContent() {
              <div className="flex-1 h-px bg-[#4d3722]/20" />
           </div>
           
-          <div className="flex justify-between w-full mt-1.5 px-0 sm:px-2 font-display italic text-[11px] text-[#4d3722] font-bold">
-            <span>Ngày lập: {dateString}</span>
-            <span>Số khách: {guests}</span>
-          </div>
+          <p className="font-display italic text-[11px] text-[#4d3722] mt-0.5 font-bold">
+            {totalItemsCount === 0 ? "Chưa có món nào được chọn" : `Gợi ý thực đơn dành cho tối đa ${guests} khách`}
+          </p>
         </div>
 
         {/* Content List */}
-        <div className="flex-1 flex flex-col px-4 sm:px-10 pt-1 relative z-10">
+        <div className="flex-1 flex flex-col px-4 sm:px-10 pt-1 relative z-10 w-full overflow-hidden">
            <ul className="flex-1 flex flex-col gap-0 pb-2">
-              {cartItems.map((item) => (
-                 <li key={item.menuItemId} className="flex flex-col relative group py-0 mt-0 sm:py-0.5">
+              {[...cartItems, ...extraItems].map((item) => (
+                 <li key={(item as any).id || (item as any).menuItemId || item.name} className="flex flex-col relative group py-0 mt-0 sm:py-0.5">
                     <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
-                      <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
+                      <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-6">
                         <span className="text-[6px] text-[#4d3722]/40 flex-shrink-0 relative -top-[2px]">⚫</span>
                         <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
                           {item.name}
@@ -310,36 +309,16 @@ function BaoGiaContent() {
                         {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
                       </p>
                     </div>
-                 </li>
-              ))}
-
-              {extraItems.map((item) => (
-                 <li key={item.id} className="flex flex-col relative group py-0 mt-0 sm:py-0.5 pr-5">
-                    <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
-                      <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-1">
-                        <span className="text-[9px] text-[#C9A84C] flex-shrink-0 relative -top-[1.5px]">✏️</span>
-                        <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
-                          {item.name}
-                          {item.quantity > 1 && (
-                            <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[11px]">
-                              (x{item.quantity})
-                            </span>
-                          )}
-                        </p>
-                        <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
-                      </div>
-                      <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
-                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
-                      </p>
-                    </div>
-                    {/* Delete Icon (No print) */}
-                    <button 
-                      onClick={() => removeExtraItem(item.id)}
-                      className="no-print absolute right-0 top-1/2 -translate-y-1/2 text-red-500/30 hover:text-red-500 transition-colors p-1"
-                      title="Xoá món này"
-                    >
-                      <X size={11} strokeWidth={2.5} />
-                    </button>
+                    {/* Xoá món (chỉ hiện mờ mờ trên góc khi chưa chụp, không in ra) */}
+                    {(item as any).isManual && (
+                      <button 
+                        onClick={() => removeExtraItem((item as any).id)}
+                        className="no-print absolute top-[30%] -translate-y-1/2 text-red-500/20 hover:text-red-500 transition-colors p-[1px] right-2"
+                        title="Xoá món này"
+                      >
+                        <X size={9} strokeWidth={3} />
+                      </button>
+                    )}
                  </li>
               ))}
            </ul>
