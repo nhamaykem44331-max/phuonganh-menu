@@ -1,7 +1,7 @@
 // src/components/menu/MenuHeader.tsx
 "use client";
 
-import { Phone, CalendarCheck, ChefHat } from "lucide-react";
+import { Phone, FileText, ChefHat } from "lucide-react";
 import Link from "next/link";
 import { useState, useEffect } from "react";
 
@@ -81,15 +81,15 @@ export function MenuHeader() {
               098.648.2222
             </a>
             <Link
-              href="#dat-ban"
+              href="/bao-gia?guests=10"
               className={`flex items-center gap-2 text-xs font-semibold uppercase tracking-widest px-5 py-2.5 transition-all ${
                 scrolled
                   ? "bg-navy text-gold border border-navy hover:bg-navy/90"
                   : "bg-gold text-navy border border-gold hover:bg-ivory hover:border-ivory"
               }`}
             >
-              <CalendarCheck size={16} strokeWidth={1.5} />
-              Đặt bàn
+              <FileText size={16} strokeWidth={1.5} />
+              Xem báo giá
             </Link>
           </div>
         </div>

@@ -155,7 +155,7 @@ function AutocompleteInput({
 function BaoGiaContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { items: cartItems, getTotalPrice: getCartTotal } = useCartStore();
+  const { items: cartItems, getTotalPrice: getCartTotal, removeItem: removeCartItem } = useCartStore();
   const paperRef = useRef<HTMLDivElement>(null);
 
   const guests = searchParams.get("guests") || "10";
@@ -175,7 +175,6 @@ function BaoGiaContent() {
   const [inputName, setInputName] = useState("");
   const [inputQuantity, setInputQuantity] = useState<number>(1);
   const [inputPrice, setInputPrice] = useState<number | "">("");
-  const [customTotalInput, setCustomTotalInput] = useState<string>("");
 
   const quantityInputRef = useRef<HTMLInputElement>(null);
 
@@ -224,13 +223,13 @@ function BaoGiaContent() {
   const dateString = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 
   const handleAddExtraItem = () => {
-    if (!inputName.trim() || inputQuantity < 1) return;
+    if (!inputName.trim() || inputPrice === "" || inputQuantity < 1) return;
     setExtraItems(prev => [
       ...prev,
       {
         id: `extra-${Date.now()}`,
         name: inputName.trim(),
-        price: inputPrice === "" ? -1 : Number(inputPrice),
+        price: Number(inputPrice),
         quantity: Number(inputQuantity),
         isManual: true
       }
@@ -244,10 +243,8 @@ function BaoGiaContent() {
     setExtraItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const totalExtraPrice = extraItems.reduce((sum, it) => sum + ((it.price === -1 ? 0 : it.price) * it.quantity), 0);
+  const totalExtraPrice = extraItems.reduce((sum, it) => sum + (it.price * it.quantity), 0);
   const finalTotal = getCartTotal() + totalExtraPrice;
-  const parsedCustomTotal = customTotalInput ? parseInt(customTotalInput.replace(/\D/g, ""), 10) : undefined;
-  const displayTotal = parsedCustomTotal !== undefined && !isNaN(parsedCustomTotal) ? parsedCustomTotal : finalTotal;
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-4 sm:py-8 flex flex-col items-center px-2 sm:px-4">
@@ -309,19 +306,17 @@ function BaoGiaContent() {
                         <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
                       </div>
                       <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
-                        {item.price === -1 ? "" : new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
+                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
                       </p>
                     </div>
-                    {/* Xoá món (chỉ hiện mờ mờ trên góc khi chưa chụp, không in ra) */}
-                    {(item as any).isManual && (
-                      <button 
-                        onClick={() => removeExtraItem((item as any).id)}
-                        className="no-print absolute top-[30%] -translate-y-1/2 text-red-500/20 hover:text-red-500 transition-colors p-[1px] right-2"
-                        title="Xoá món này"
-                      >
-                        <X size={9} strokeWidth={3} />
-                      </button>
-                    )}
+                    {/* Xoá món (chỉ hiện mờ mờ trên góc tĩnh, không in ra) */}
+                    <button 
+                      onClick={() => (item as any).isManual ? removeExtraItem((item as any).id) : removeCartItem((item as any).menuItemId)}
+                      className="no-print absolute top-[30%] -translate-y-1/2 text-red-500/20 hover:text-red-500 transition-colors p-[1px] right-2"
+                      title="Xoá món này"
+                    >
+                      <X size={9} strokeWidth={3} />
+                    </button>
                  </li>
               ))}
            </ul>
@@ -335,7 +330,7 @@ function BaoGiaContent() {
                  Tổng Cộng
               </span>
               <span className="font-display font-black text-[#CA2026] text-[20px] sm:text-[24px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] leading-none tracking-tight">
-                 {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(displayTotal)}
+                 {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(finalTotal)}
               </span>
            </div>
 
@@ -409,15 +404,6 @@ function BaoGiaContent() {
           >
             THÊM
           </button>
-        </div>
-        <div className="flex justify-end gap-1.5 mt-2 mb-1">
-          <label className="text-[10px] sm:text-[11px] text-[#4d3722]/70 italic mt-1.5">Sửa Tổng Tiền:</label>
-          <input
-            value={customTotalInput}
-            onChange={(e) => setCustomTotalInput(e.target.value)}
-            placeholder="Tự điền tổng gộp..."
-            className="w-[120px] border border-[#C9A84C]/50 text-[11px] px-2 py-1.5 rounded-sm bg-white focus:outline-none focus:border-[#4d3722]"
-          />
         </div>
       </div>
 
