@@ -27,16 +27,16 @@ export function CartDrawer() {
   const [noteInput, setNoteInput] = useState("");
   const [customName, setCustomName] = useState("");
   const [customPrice, setCustomPrice] = useState("");
+  const [customTotalInput, setCustomTotalInput] = useState("");
 
   const handleAddCustom = () => {
-    if (!customName.trim() || !customPrice) return;
-    const price = parseInt(customPrice.replace(/\D/g, ""), 10);
-    if (isNaN(price)) return;
+    if (!customName.trim()) return;
+    const price = customPrice ? parseInt(customPrice.replace(/\D/g, ""), 10) : -1;
     
     addItem({
       menuItemId: `custom-${Date.now()}`,
       name: customName.trim(),
-      price: price,
+      price: isNaN(price) ? -1 : price,
     });
     setCustomName("");
     setCustomPrice("");
@@ -44,6 +44,8 @@ export function CartDrawer() {
 
   const totalPrice = getTotalPrice();
   const totalItems = getTotalItems();
+  const parsedCustomTotal = customTotalInput ? parseInt(customTotalInput.replace(/\D/g, ""), 10) : undefined;
+  const displayTotal = parsedCustomTotal !== undefined && !isNaN(parsedCustomTotal) ? parsedCustomTotal : totalPrice;
 
   const openNote = (menuItemId: string, currentNote?: string) => {
     setEditingNoteId(menuItemId);
@@ -162,7 +164,7 @@ export function CartDrawer() {
                               <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
                             </div>
                             <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
-                              {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
+                              {item.price === -1 ? "" : new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
                             </p>
                           </div>
                           
@@ -220,7 +222,7 @@ export function CartDrawer() {
                         Tổng Cộng
                       </span>
                       <span className="font-display font-black text-[#CA2026] text-[20px] sm:text-[24px] drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)] leading-none tracking-tight">
-                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(totalPrice)}
+                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(displayTotal)}
                       </span>
                     </div>
 
@@ -244,6 +246,17 @@ export function CartDrawer() {
                 {/* UI Action Buttons (Hide in standard Zalo crop visually or use tools) */}
                 <div className={`pt-4 mt-2 ${items.length > 0 ? 'border-t border-[#4d3722]/10' : ''} space-y-2 relative`} data-html2canvas-ignore="true">
                   
+                  {/* SỬA TỔNG TIỀN */}
+                  <div className="flex justify-start gap-1.5 mb-2 mt-1 -mt-2">
+                    <label className="text-[10px] text-[#4d3722]/70 italic mt-1.5">Sửa Tổng Tiền:</label>
+                    <input
+                      value={customTotalInput}
+                      onChange={(e) => setCustomTotalInput(e.target.value)}
+                      placeholder="Nhập giá gộp..."
+                      className="border border-[#4d3722]/20 text-[11px] px-2 py-1 flex-1 max-w-[150px] rounded-sm bg-white focus:outline-none focus:border-navy"
+                    />
+                  </div>
+
                   {/* CUSTOM MENU INPUT */}
                   <div className="flex gap-1.5 mb-3">
                     <input
