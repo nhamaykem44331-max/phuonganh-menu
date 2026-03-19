@@ -3,6 +3,8 @@
 
 import { useState, useMemo, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
+import { Lock } from "lucide-react";
 import { CategoryTabs } from "./CategoryTabs";
 import { SearchBar } from "./SearchBar";
 import { MenuGrid } from "./MenuGrid";
@@ -192,8 +194,11 @@ export function MenuClient({ categories, menuItems, banners }: MenuClientProps) 
             </div>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto px-4 mt-16 pt-8 border-t border-gold/10 text-[10px] uppercase tracking-widest text-center text-ivory/40">
-          © {new Date().getFullYear()} PHƯƠNG ANH HOSPITALITY. ALL RIGHTS RESERVED.
+        <div className="max-w-6xl mx-auto px-4 mt-16 pt-8 border-t border-gold/10 flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] uppercase tracking-widest text-ivory/40">
+          <p>© {new Date().getFullYear()} PHƯƠNG ANH HOSPITALITY. ALL RIGHTS RESERVED.</p>
+          <Link href="/admin" className="flex items-center gap-1.5 hover:text-gold transition-colors font-medium">
+            <Lock size={10} strokeWidth={2} /> Đăng nhập quản trị
+          </Link>
         </div>
       </footer>
     </>
