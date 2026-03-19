@@ -14,9 +14,13 @@ const UpdateCategorySchema = z.object({
   isActive: z.boolean().optional(),
 });
 
-export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(
+  request: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
+) {
   try {
     await requireAdmin();
+    const params = await context.params;
     const body = await request.json();
     const data = UpdateCategorySchema.parse(body);
 
@@ -47,9 +51,13 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _request: NextRequest,
+  context: { params: { id: string } | Promise<{ id: string }> }
+) {
   try {
     await requireAdmin();
+    const params = await context.params;
     await prisma.category.update({
       where: { id: params.id },
       data: { isActive: false },
