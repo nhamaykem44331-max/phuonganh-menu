@@ -113,13 +113,12 @@ export function MenuCard({ item, index }: MenuCardProps) {
       `}</style>
 
       {/* Image */}
-      <div className="menu-img-wrap bg-ivory h-48 sm:h-56">
-        <Image
+      <div className="menu-img-wrap bg-ivory h-48 sm:h-56 relative isolate">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
           src={displayImage}
           alt={item.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+          className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
 
         {/* Tag badge - Elegant Italic Style */}

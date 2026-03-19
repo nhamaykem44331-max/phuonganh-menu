@@ -350,7 +350,7 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
                     className="w-full px-3 py-2.5 pr-10 text-sm font-medium text-slate-800 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30"
                     placeholder="https://res.cloudinary.com/..."
                   />
-                  {form.imageUrl?.includes("pollinations.ai") && (
+                  {(form.imageUrl?.includes("pollinations") || form.imageUrl?.includes("leonardo")) && (
                     <span className="absolute right-2 top-1/2 -translate-y-1/2 
                       text-[10px] bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded-full font-bold">
                       AI
@@ -371,12 +371,12 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
                           (e.target as HTMLImageElement).style.display = "none";
                         }}
                       />
-                      {/* Loading overlay khi ảnh Pollinations đang load */}
+                      {/* Loading overlay khi ảnh AI đang load */}
                       <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-xs text-slate-400 font-medium z-0">
                         🖼️ Đang tải ảnh...
                       </div>
                     </div>
-                    {form.imageUrl?.includes("pollinations.ai") && (
+                    {(form.imageUrl?.includes("pollinations") || form.imageUrl?.includes("leonardo")) && (
                       <p className="text-[11px] text-violet-600 flex items-center gap-1 font-semibold">
                         ✨ Ảnh được tạo bởi AI — bạn có thể thay bằng URL khác
                       </p>
@@ -783,7 +783,8 @@ export function MenuManagerClient({ initialItems, categories }: MenuManagerClien
                       <div className="flex items-center gap-3 max-w-[280px]">
                         {item.imageUrl ? (
                           <div className="relative w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-[var(--admin-border)] shadow-sm">
-                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           </div>
                         ) : (
                           <div className="w-12 h-12 rounded-xl border border-[var(--admin-border)] bg-slate-50 flex items-center justify-center text-xl flex-shrink-0 shadow-sm">

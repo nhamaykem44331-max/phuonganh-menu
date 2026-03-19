@@ -81,7 +81,10 @@ export async function GET(request: NextRequest) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
     }
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Lỗi server" },
+      { status: 500 }
+    );
   }
 }
 
@@ -149,6 +152,9 @@ export async function POST(request: NextRequest) {
     if (error instanceof Error && error.message === "Unauthorized") {
       return NextResponse.json({ error: "Chưa đăng nhập" }, { status: 401 });
     }
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Lỗi server" },
+      { status: 500 }
+    );
   }
 }

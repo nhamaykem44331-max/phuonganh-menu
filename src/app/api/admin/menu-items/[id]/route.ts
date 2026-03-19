@@ -27,13 +27,15 @@ const UpdateMenuItemSchema = z.object({
 
 export async function GET(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
+    const params = await context.params;
+    const id = params.id;
 
     const item = await prisma.menuItem.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         category: true,
         priceHistory: {
@@ -56,7 +58,7 @@ export async function GET(
         originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
       },
     });
-  } catch {
+  } catch (error) {
     return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
   }
 }
@@ -67,24 +69,27 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     const session = await requireAdmin();
     const body = await request.json();
     const data = UpdateMenuItemSchema.parse(body);
 
+    const params = await context.params;
+    const id = params.id;
+
     // Nếu có thay đổi giá → lưu lịch sử
     if (data.price !== undefined) {
       const currentItem = await prisma.menuItem.findUnique({
-        where: { id: params.id },
+        where: { id },
         select: { price: true },
       });
 
       if (currentItem && Number(currentItem.price) !== data.price) {
         await prisma.priceHistory.create({
           data: {
-            menuItemId: params.id,
+            menuItemId: id,
             oldPrice: currentItem.price,
             newPrice: data.price,
             changedBy: session.user.id,
@@ -94,7 +99,7 @@ export async function PUT(
     }
 
     const updated = await prisma.menuItem.update({
-      where: { id: params.id },
+      where: { id },
       data,
       include: {
         category: { select: { id: true, name: true, slug: true } },
@@ -122,7 +127,10 @@ export async function PUT(
         { status: 400 }
       );
     }
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Lỗi server" },
+      { status: 500 }
+    );
   }
 }
 
@@ -132,14 +140,16 @@ export async function PUT(
 
 export async function DELETE(
   _request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: { id: string } | Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
+    const params = await context.params;
+    const id = params.id;
 
     // Soft delete: chỉ ẩn đi, không xóa khỏi DB
     await prisma.menuItem.update({
-      where: { id: params.id },
+      where: { id },
       data: { isAvailable: false },
     });
 
@@ -152,6 +162,9 @@ export async function DELETE(
       message: "Món đã được ẩn khỏi thực đơn",
     });
   } catch {
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Lỗi server" },
+      { status: 500 }
+    );
   }
 }

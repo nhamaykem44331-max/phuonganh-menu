@@ -339,8 +339,9 @@ function CustomMenuPicker({
                     >
                       <div className="flex items-center gap-3 flex-1 min-w-0">
                         {item.imageUrl ? (
-                          <div className="relative w-9 h-9 rounded-lg overflow-hidden flex-shrink-0">
-                            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                          <div className="w-12 h-12 relative rounded-xl overflow-hidden shrink-0 border border-slate-200">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           </div>
                         ) : (
                           <div className="w-9 h-9 rounded-lg bg-jade-light flex items-center justify-center text-base flex-shrink-0">🍽️</div>
@@ -556,7 +557,10 @@ export function BanquetPageClient({
               <div key={room.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-[rgb(var(--border))]">
                 <div className="relative h-40 bg-jade-light">
                   {room.images[0] || getRoomImage(room.name) ? (
-                    <Image src={room.images[0] || getRoomImage(room.name)} alt={room.name} fill className="object-cover" />
+                    <div className="relative w-full h-full">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={room.images[0] || getRoomImage(room.name)} alt={room.name} className="w-full h-full object-cover" />
+                    </div>
                   ) : (
                     <div className="flex items-center justify-center h-full text-5xl opacity-20">🏛️</div>
                   )}

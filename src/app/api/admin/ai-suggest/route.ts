@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // BƯỚC 1: Gọi Gemini API sinh text
     const apiKey = process.env.GEMINI_API_KEY ?? "";
     const geminiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: {
@@ -80,17 +80,64 @@ Hãy trả về JSON hợp lệ (chỉ trả về JSON theo đúng định dạn
       };
     }
 
-    // BƯỚC 2: Tạo URL ảnh từ Pollinations.ai
-    const keyword = aiResult.imageKeyword || 
-      name.toLowerCase().replace(/\s+/g, "-");
+    // BƯỚC 2: Tạo URL ảnh từ Leonardo.ai
+    const keyword = aiResult.imageKeyword || name.toLowerCase().replace(/\s+/g, "-");
+    const imagePrompt = `${keyword} vietnamese fine dining food photography, dark background, elegant plating, professional restaurant, high resolution 8k.`;
     
-    const imagePrompt = encodeURIComponent(
-      `${keyword} vietnamese fine dining food photography ` +
-      `dark background elegant plating professional restaurant`
-    );
-    
-    const imageUrl = `https://image.pollinations.ai/prompt/${imagePrompt}` +
-      `?width=800&height=600&nologo=true&enhance=true&model=flux`;
+    let imageUrl = "";
+    const leoApiKey = process.env.LEONARDO_API_KEY;
+
+    if (leoApiKey) {
+      try {
+        // Yêu cầu tạo ảnh
+        const leoCreateRes = await fetch("https://cloud.leonardo.ai/api/rest/v1/generations", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${leoApiKey}`,
+            "accept": "application/json"
+          },
+          body: JSON.stringify({
+            prompt: imagePrompt,
+            num_images: 1,
+            width: 832,
+            height: 576,
+            promptMagic: true // Tăng cường độ chi tiết ảnh
+          })
+        });
+
+        const leoCreateData = await leoCreateRes.json();
+        const generationId = leoCreateData?.sdGenerationJob?.generationId;
+
+        if (generationId) {
+          // Polling kết quả (Tối đa 5 lần = 15s)
+          for (let i = 0; i < 5; i++) {
+            await new Promise((resolve) => setTimeout(resolve, 3000));
+            const leoGetRes = await fetch(`https://cloud.leonardo.ai/api/rest/v1/generations/${generationId}`, {
+              headers: {
+                "Authorization": `Bearer ${leoApiKey}`,
+                "accept": "application/json"
+              }
+            });
+            const leoGetData = await leoGetRes.json();
+            const images = leoGetData?.generations_by_pk?.generated_images;
+            
+            if (images && images.length > 0) {
+              imageUrl = images[0].url;
+              break;
+            }
+          }
+        }
+      } catch (err) {
+        console.error("Leonardo API Error:", err);
+      }
+    }
+
+    // Nếu Leonardo thất bại (hoặc chưa setup API key), dùng lại Pollinations.ai tạm thời
+    if (!imageUrl) {
+      const fallbackPrompt = encodeURIComponent(imagePrompt);
+      imageUrl = `https://image.pollinations.ai/prompt/${fallbackPrompt}?width=800&height=600&nologo=true&enhance=true&model=flux`;
+    }
 
     return NextResponse.json({
       success: true,

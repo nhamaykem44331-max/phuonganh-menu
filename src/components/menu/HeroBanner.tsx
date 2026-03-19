@@ -72,13 +72,11 @@ export function HeroBanner({ banners }: { banners: Banner[] }) {
           style={{ opacity: i === current ? 1 : 0 }}
         >
           <Wrapper>
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={b.imageUrl}
               alt={b.title}
-              fill
-              className="object-cover"
-              priority={i === 0}
-              sizes="100vw"
+              className="absolute inset-0 w-full h-full object-cover object-center"
             />
             {/* Fine Dining Gradient overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-navy/90 via-navy/30 to-black/30" />
