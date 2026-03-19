@@ -167,14 +167,15 @@ function BaoGiaContent() {
   const [extraItems, setExtraItems] = useState<Array<{
     id: string; 
     name: string;
-    quantity: number; 
-    price: number;
+    quantity: number | null; 
+    price: number | null;
     isManual: boolean;
   }>>([]);
 
   const [inputName, setInputName] = useState("");
-  const [inputQuantity, setInputQuantity] = useState<number>(1);
+  const [inputQuantity, setInputQuantity] = useState<number | "">("");
   const [inputPrice, setInputPrice] = useState<number | "">("");
+  const [overrideTotal, setOverrideTotal] = useState<number | "">("");
 
   const quantityInputRef = useRef<HTMLInputElement>(null);
 
@@ -209,28 +210,29 @@ function BaoGiaContent() {
   const dateString = `${today.getDate().toString().padStart(2, '0')}/${(today.getMonth()+1).toString().padStart(2, '0')}/${today.getFullYear()}`;
 
   const handleAddExtraItem = () => {
-    if (!inputName.trim() || inputPrice === "" || inputQuantity < 1) return;
+    if (!inputName.trim()) return;
     setExtraItems(prev => [
       ...prev,
       {
         id: `extra-${Date.now()}`,
         name: inputName.trim(),
-        price: Number(inputPrice),
-        quantity: Number(inputQuantity),
+        price: inputPrice === "" ? null : Number(inputPrice),
+        quantity: inputQuantity === "" || Number(inputQuantity) < 1 ? null : Number(inputQuantity),
         isManual: true
       }
     ]);
     setInputName("");
     setInputPrice("");
-    setInputQuantity(1);
+    setInputQuantity("");
   };
 
   const removeExtraItem = (id: string) => {
     setExtraItems(prev => prev.filter(item => item.id !== id));
   };
 
-  const totalExtraPrice = extraItems.reduce((sum, it) => sum + (it.price * it.quantity), 0);
-  const finalTotal = getCartTotal() + totalExtraPrice;
+  const totalExtraPrice = extraItems.reduce((sum, it) => sum + ((it.price || 0) * (it.quantity || 1)), 0);
+  const calculatedTotal = getCartTotal() + totalExtraPrice;
+  const finalTotal = overrideTotal !== "" ? Number(overrideTotal) : calculatedTotal;
 
   return (
     <div className="min-h-screen bg-gray-50/50 py-4 sm:py-8 flex flex-col items-center px-2 sm:px-4">
@@ -276,24 +278,30 @@ function BaoGiaContent() {
         {/* Content List */}
         <div className="flex-1 flex flex-col px-4 sm:px-10 pt-1 relative z-10 w-full overflow-hidden">
            <ul className="flex-1 flex flex-col gap-0 pb-2">
-              {[...cartItems, ...extraItems].map((item) => (
+              {[...cartItems, ...extraItems].map((item) => {
+                 const hasPrice = item.price !== null && item.price !== undefined;
+                 return (
                  <li key={(item as any).id || (item as any).menuItemId || item.name} className="flex flex-col relative group py-0 mt-0 sm:py-0.5">
                     <div className="flex justify-between items-baseline w-full gap-1.5 mt-0.5">
                       <div className="flex items-baseline gap-1.5 flex-1 min-w-0 pr-6">
                         <span className="text-[6px] text-[#4d3722]/40 flex-shrink-0 relative -top-[2px]">⚫</span>
                         <p className="font-display font-extrabold text-[#4d3722] uppercase tracking-tight text-[11.5px] sm:text-[13.5px] leading-tight break-words">
                           {item.name}
-                          {item.quantity > 1 && (
+                          {hasPrice && item.quantity && item.quantity > 1 && (
                             <span className="lowercase font-body font-normal text-[#4d3722] ml-1.5 opacity-80 whitespace-nowrap text-[11px]">
                               (x{item.quantity})
                             </span>
                           )}
                         </p>
-                        <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
+                        {hasPrice && (
+                          <div className="flex-1 border-b border-dotted border-[#4d3722]/30 opacity-60 relative min-w-[20px]" style={{ bottom: '4px' }} />
+                        )}
                       </div>
-                      <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
-                        {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price * item.quantity)}
-                      </p>
+                      {hasPrice && (
+                        <p className="font-body font-black text-[#4d3722] text-[12.5px] sm:text-[14.5px] flex-shrink-0 tracking-tight leading-tight">
+                          {new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 0 }).format(item.price! * (item.quantity || 1))}
+                        </p>
+                      )}
                     </div>
                     {/* Xoá món (chỉ hiện mờ mờ trên góc tĩnh, không in ra) */}
                     <button 
@@ -304,7 +312,7 @@ function BaoGiaContent() {
                       <X size={9} strokeWidth={3} />
                     </button>
                  </li>
-              ))}
+              )})}
            </ul>
         </div>
 
@@ -345,51 +353,77 @@ function BaoGiaContent() {
       </div>
       {/* END BAO GIA PAPER */}
 
-      {/* MANUALLY ADD ITEM FORM (NO PRINT) */}
-      <div className="no-print w-full max-w-[600px] mt-6 px-1">
-        <label className="block text-[11px] font-semibold text-[#4d3722] uppercase tracking-wider mb-2">Thêm món vào báo giá:</label>
-        <div className="flex gap-1.5 sm:gap-2 items-stretch h-[36px]">
-          <div className="flex-1 bg-white relative">
-            <AutocompleteInput 
-               value={inputName}
-               onChange={setInputName}
-               onSelect={(item) => {
-                 setInputName(item.name);
-                 setInputPrice(item.price);
-                 quantityInputRef.current?.focus();
-               }}
-            />
+      {/* MANUALLY ADD ITEM FORM & OVERRIDE FORM (NO PRINT) */}
+      <div className="no-print w-full max-w-[600px] mt-6 px-1 flex flex-col gap-4">
+        {/* ROW 1: ADD ITEM */}
+        <div>
+          <label className="block text-[11px] font-semibold text-[#4d3722] uppercase tracking-wider mb-2">Thêm món / Ghi chú (để trống giá nếu muốn):</label>
+          <div className="flex gap-1.5 sm:gap-2 items-stretch h-[36px]">
+            <div className="flex-1 bg-white relative">
+              <AutocompleteInput 
+                 value={inputName}
+                 onChange={setInputName}
+                 onSelect={(item) => {
+                   setInputName(item.name);
+                   setInputPrice(item.price);
+                   quantityInputRef.current?.focus();
+                 }}
+              />
+            </div>
+            <div className="w-[45px] sm:w-[50px] relative">
+              <input 
+                ref={quantityInputRef}
+                type="number" 
+                min={1} 
+                placeholder="SL"
+                value={inputQuantity}
+                onChange={(e) => setInputQuantity(e.target.value ? Number(e.target.value) : "")}
+                className="w-full h-full border border-[#C9A84C]/50 px-1 rounded-sm text-center text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
+                title="Số lượng"
+              />
+            </div>
+            <div className="w-[80px] sm:w-[110px] relative">
+              <input 
+                type="number" 
+                placeholder="Giá..." 
+                value={inputPrice}
+                onChange={(e) => setInputPrice(e.target.value ? Number(e.target.value) : "")}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') handleAddExtraItem();
+                }}
+                className="w-full h-full border border-[#C9A84C]/50 px-2 rounded-sm text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
+                title="Đơn giá"
+              />
+            </div>
+            <button 
+              onClick={handleAddExtraItem}
+              className="bg-[#4d3722] hover:bg-navy text-[#C9A84C] font-semibold tracking-widest uppercase text-[10px] sm:text-[11px] px-3 sm:px-4 flex items-center justify-center rounded-sm transition-colors shrink-0"
+            >
+              THÊM
+            </button>
           </div>
-          <div className="w-[50px] sm:w-[60px] relative">
+        </div>
+
+        {/* ROW 2: OVERRIDE TOTAL */}
+        <div>
+          <label className="block text-[11px] font-semibold text-[#4d3722] uppercase tracking-wider mb-2">Tuỳ chỉnh tổng cộng (Để trống = Tự động tính):</label>
+          <div className="flex gap-1.5 sm:gap-2 items-stretch h-[36px]">
             <input 
-              ref={quantityInputRef}
               type="number" 
-              min={1} 
-              value={inputQuantity}
-              onChange={(e) => setInputQuantity(Number(e.target.value))}
-              className="w-full h-full border border-[#C9A84C]/50 px-1 sm:px-2 rounded-sm text-center text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
-              title="Số lượng"
+              placeholder={`Đang tự tính: ${new Intl.NumberFormat("vi-VN").format(calculatedTotal)} đ`} 
+              value={overrideTotal}
+              onChange={(e) => setOverrideTotal(e.target.value ? Number(e.target.value) : "")}
+              className="w-full sm:w-[50%] h-full border border-[#C9A84C]/50 px-3 rounded-sm text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
             />
+            {overrideTotal !== "" && (
+              <button 
+                onClick={() => setOverrideTotal("")} 
+                className="px-3 text-[11px] font-semibold text-[#4d3722] underline hover:text-red-500 shrink-0"
+              >
+                Bỏ tuỳ chỉnh
+              </button>
+            )}
           </div>
-          <div className="w-[90px] sm:w-[120px] relative">
-            <input 
-              type="number" 
-              placeholder="Giá..." 
-              value={inputPrice}
-              onChange={(e) => setInputPrice(Number(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddExtraItem();
-              }}
-              className="w-full h-full border border-[#C9A84C]/50 px-2 py-2 rounded-sm text-[12px] bg-white text-[#4d3722] focus:outline-none focus:border-[#4d3722]"
-              title="Đơn giá"
-            />
-          </div>
-          <button 
-            onClick={handleAddExtraItem}
-            className="bg-[#4d3722] hover:bg-navy text-[#C9A84C] font-semibold tracking-widest uppercase text-[10px] sm:text-[11px] px-3 sm:px-5 flex items-center justify-center rounded-sm transition-colors shrink-0"
-          >
-            THÊM
-          </button>
         </div>
       </div>
 
