@@ -8,6 +8,16 @@ import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 
 // =============================================
+// VALIDATE REQUIRED ENV VARS (S4)
+// =============================================
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error(
+    "❌ NEXTAUTH_SECRET is not set. Please add it to your .env file.\n" +
+    "Generate one with: openssl rand -base64 32"
+  );
+}
+
+// =============================================
 // NEXTAUTH CONFIG
 // =============================================
 

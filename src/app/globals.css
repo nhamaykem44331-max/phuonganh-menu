@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap');
+/* Fonts are loaded via next/font in layout.tsx — no @import needed (M6) */
 
 @tailwind base;
 @tailwind components;
@@ -48,12 +48,16 @@
   }
 
   * {
-    @apply border-border;
     box-sizing: border-box;
   }
 
+  /* M7: Scope border-color to semantic containers, not all elements */
+  div, section, article, aside, nav, header, footer, main, fieldset {
+    border-color: rgb(var(--border));
+  }
+
   html {
-    font-family: 'Lora', serif;
+    font-family: var(--font-body, 'Lora'), serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     scroll-behavior: smooth;
@@ -67,7 +71,7 @@
   }
 
   h1, h2, h3, h4 {
-    font-family: 'Cormorant Garamond', serif;
+    font-family: var(--font-display, 'Cormorant Garamond'), serif;
     font-weight: 700;
     letter-spacing: 0.02em;
     line-height: 1.2;
@@ -89,9 +93,9 @@
   .bg-ivory       { background-color: rgb(var(--ivory)); }
 
   /* Typography */
-  .font-display   { font-family: 'Cormorant Garamond', serif; }
-  .font-body      { font-family: 'Lora', serif; }
-  .font-ui        { font-family: 'Inter', sans-serif; }
+  .font-display   { font-family: var(--font-display, 'Cormorant Garamond'), serif; }
+  .font-body      { font-family: var(--font-body, 'Lora'), serif; }
+  .font-ui        { font-family: var(--font-ui, 'Inter'), sans-serif; }
 
   /* Card hover lift - Luxury soft shadow */
   .card-lift {

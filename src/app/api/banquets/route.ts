@@ -60,7 +60,19 @@ export async function POST(request: NextRequest) {
         eventDate: new Date(data.eventDate),
         guestCount: data.guestCount,
         pricePerPerson: data.pricePerPerson ?? null,
-        menuSet: data.menuSet ? JSON.stringify(data.menuSet) : undefined,
+        menuSet: JSON.stringify({
+          items: data.menuSet || [],
+          metadata: {
+            bookingId: "BK" + Date.now().toString().slice(-11),
+            companyName: "",
+            tableCount: Math.ceil((data.guestCount || 10) / 10),
+            eventTime: "17:30",
+            preOrderMenu: "",
+            additionalServices: [],
+            staffAssigned: null,
+            reminderSent: false,
+          }
+        }),
         totalPrice,
         status: "INQUIRY",
         note: data.note,

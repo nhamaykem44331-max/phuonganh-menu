@@ -1,6 +1,8 @@
 // src/lib/webhooks.ts
 // n8n Webhook Integration - Gửi sự kiện ra n8n để automation
 
+import { createHmac } from "crypto";
+
 type WebhookEvent =
   | "order.created"
   | "order.updated"
@@ -13,6 +15,14 @@ interface WebhookPayload {
   event: WebhookEvent;
   timestamp: string;
   data: Record<string, unknown>;
+}
+
+// =============================================
+// HMAC SIGNATURE (S9)
+// =============================================
+
+function signPayload(body: string, secret: string): string {
+  return createHmac("sha256", secret).update(body).digest("hex");
 }
 
 // =============================================
@@ -49,19 +59,35 @@ export async function fireWebhook(
     data,
   };
 
+  const bodyStr = JSON.stringify(payload);
+
+  // S9: HMAC-SHA256 signature thay vì gửi secret plaintext
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+  };
+  if (secret) {
+    headers["X-Webhook-Signature"] = signPayload(bodyStr, secret);
+  }
+
   try {
     // Fire and forget - không await để không block response
     fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        ...(secret ? { "X-Webhook-Secret": secret } : {}),
-      },
-      body: JSON.stringify(payload),
+      headers,
+      body: bodyStr,
       signal: AbortSignal.timeout(5000), // Timeout 5s
-    }).catch((err) => {
-      console.error(`[Webhook] Lỗi gửi event ${event}:`, err.message);
-    });
+    })
+      .then(async (res) => {
+        // S8: Log response status
+        if (!res.ok) {
+          console.error(
+            `[Webhook] Event ${event} → ${res.status} ${res.statusText}`
+          );
+        }
+      })
+      .catch((err) => {
+        console.error(`[Webhook] Lỗi gửi event ${event}:`, err.message);
+      });
   } catch (err) {
     // Log nhưng không throw - webhook fail không nên ảnh hưởng response
     console.error(`[Webhook] Không thể gửi event ${event}:`, err);
