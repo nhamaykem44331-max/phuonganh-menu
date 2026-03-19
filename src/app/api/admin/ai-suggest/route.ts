@@ -13,45 +13,51 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // BƯỚC 1: Gọi Claude API sinh text
-    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": process.env.ANTHROPIC_API_KEY ?? "",
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-3-haiku-20240307", // Đổi sang Haiku cho nhẹ, nhanh và tránh lỗi giới hạn Opus
-        max_tokens: 500,
-        messages: [
-          {
-            role: "user",
-            content: `Bạn là chuyên gia ẩm thực Việt Nam.
+    // BƯỚC 1: Gọi Gemini API sinh text
+    const apiKey = process.env.GEMINI_API_KEY ?? "";
+    const geminiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                {
+                  text: `Bạn là chuyên gia ẩm thực Việt Nam.
 Tên món ăn: "${name}"
 
-Hãy trả về JSON hợp lệ (không có text thừa, không markdown, chỉ trả về code json trực tiếp và duy nhất):
+Hãy trả về JSON hợp lệ (chỉ trả về JSON theo đúng định dạng sau):
 {
   "nameEn": "tên món bằng tiếng Anh, ngắn gọn",
   "description": "mô tả hấp dẫn bằng tiếng Việt, 1-2 câu, nêu nguyên liệu chính và cách chế biến đặc trưng",
   "descriptionEn": "same description in English, 1-2 sentences",
   "imageKeyword": "3-5 từ tiếng Anh mô tả món ăn để tìm ảnh, ví dụ: grilled-chicken-honey-vietnamese"
 }`
+                }
+              ]
+            }
+          ],
+          generationConfig: {
+            responseMimeType: "application/json",
           }
-        ]
-      }),
-    });
+        }),
+      }
+    );
 
-    const claudeData = await claudeRes.json();
+    const geminiData = await geminiRes.json();
     
-    if (!claudeRes.ok) {
-       console.error("Claude API Error:", claudeData);
-       throw new Error(claudeData?.error?.message || "Lỗi khi gọi Claude API");
+    if (!geminiRes.ok) {
+       console.error("Gemini API Error:", geminiData);
+       throw new Error(geminiData?.error?.message || "Lỗi khi gọi Gemini API");
     }
 
-    let rawText = claudeData.content?.[0]?.text ?? "{}";
+    let rawText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text ?? "{}";
     
-    // Xoá markdown wrapper nếu Claude vẫn trả về
+    // Xoá markdown wrapper nếu Gemini vẫn trả về
     rawText = rawText.replace(/```json/g, "").replace(/```/g, "").trim();
     
     let aiResult: {
