@@ -14,9 +14,9 @@ export default async function AdminRootLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[var(--admin-bg)]">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden bg-[var(--admin-bg)]">
       <AdminSidebar user={session.user} />
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative z-10">
         {children}
       </main>
     </div>

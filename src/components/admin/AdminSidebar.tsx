@@ -7,7 +7,7 @@ import { signOut } from "next-auth/react";
 import {
   LayoutDashboard, UtensilsCrossed, ShoppingBag,
   BarChart3, Settings, LogOut, ChefHat,
-  CalendarCheck, Users, Tag, ChevronLeft, ChevronRight
+  CalendarCheck, Users, Tag, ChevronLeft, ChevronRight, Menu, X
 } from "lucide-react";
 
 interface AdminSidebarProps {
@@ -30,6 +30,7 @@ import { useState } from "react";
 export function AdminSidebar({ user }: AdminSidebarProps) {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const isActive = (href: string, exact = false) => {
     if (exact) return pathname === href;
@@ -37,10 +38,44 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
   };
 
   return (
-    <aside className={`${isCollapsed ? "w-[80px]" : "w-[240px]"} transition-all duration-300 bg-[var(--admin-sidebar)] border-r border-white/5 flex flex-col h-full shadow-xl z-20 shrink-0 relative`}>
-      {/* Logo */}
-      <div className={`px-6 py-6 border-b border-white/5 ${isCollapsed ? "flex justify-center px-0" : ""}`}>
-        <div className={`flex items-center ${isCollapsed ? "justify-center" : "gap-3"}`}>
+    <>
+      {/* Mobile Top Header */}
+      <div className="md:hidden flex items-center justify-between bg-[var(--admin-sidebar)] text-white p-4 h-16 shrink-0 relative z-30 shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 bg-[var(--admin-primary)] rounded-lg flex items-center justify-center shadow-lg">
+            <ChefHat size={16} className="text-white" />
+          </div>
+          <span className="font-display font-bold whitespace-nowrap text-sm tracking-wider uppercase">
+            Phương Anh RMS
+          </span>
+        </div>
+        <button 
+          onClick={() => setMobileOpen(true)}
+          className="p-2 -mr-2 text-[var(--admin-sidebar-text)] hover:text-white transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Overlay */}
+      {mobileOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 md:hidden backdrop-blur-sm transition-opacity"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar Drawer */}
+      <aside className={`
+        fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out
+        ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+        md:relative md:translate-x-0 md:z-20
+        ${isCollapsed ? "md:w-[80px]" : "md:w-[240px]"} w-[280px]
+        bg-[var(--admin-sidebar)] border-r border-white/5 flex flex-col h-full shadow-2xl md:shadow-xl shrink-0
+      `}>
+        {/* Logo Section */}
+        <div className={`px-6 py-6 border-b border-white/5 flex items-center justify-between md:block ${isCollapsed ? "md:px-0" : ""}`}>
+          <div className={`flex items-center ${isCollapsed ? "md:justify-center" : "gap-3"}`}>
           <div className="w-9 h-9 shrink-0 bg-[var(--admin-primary)] rounded-xl flex items-center justify-center shadow-lg shadow-[var(--admin-primary)]/20">
             <ChefHat size={18} className="text-white relative top-[-1px]" />
           </div>
@@ -65,6 +100,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
             <Link
               key={href}
               href={href}
+              onClick={() => setMobileOpen(false)}
               title={isCollapsed ? label : undefined}
               className={`flex items-center gap-3 py-3 text-[13px] rounded-xl transition-all font-ui ${isCollapsed ? "justify-center px-0" : "px-4"} ${
                 active
@@ -73,7 +109,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
               }`}
             >
               <Icon size={16} strokeWidth={active ? 2.5 : 2} className={active ? "text-white shrink-0" : "opacity-80 shrink-0"} />
-              {!isCollapsed && <span className="truncate">{label}</span>}
+              <span className={`truncate ${isCollapsed ? "md:hidden" : ""}`}>{label}</span>
             </Link>
           );
         })}
@@ -99,5 +135,6 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </button>
       </div>
     </aside>
+    </>
   );
 }

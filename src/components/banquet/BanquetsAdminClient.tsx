@@ -472,12 +472,12 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
       {activeTab === "overview" && (
         <div className="space-y-6 animate-in fade-in duration-300">
           {/* Header */}
-          <div className="flex justify-between items-end">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-3">
              <div>
-               <h1 className="text-2xl font-display font-semibold text-slate-800">Tiệc & Sự kiện</h1>
-               <p className="text-sm text-slate-500 mt-1">Quản lý đặt tiệc, báo giá, theo dõi lịch sự kiện</p>
+               <h1 className="text-xl md:text-2xl font-display font-semibold text-slate-800">Tiệc & Sự kiện</h1>
+               <p className="text-xs md:text-sm text-slate-500 mt-1">Quản lý đặt tiệc, báo giá, theo dõi lịch sự kiện</p>
              </div>
-             <button onClick={() => { setModalInitRoom(""); setModalInitDate(""); setModalBanquet(null); setModalOpen(true); }} className="shrink-0 flex items-center gap-2 px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm rounded-md shadow-sm"><Plus size={16} /> Thêm đặt tiệc</button>
+             <button onClick={() => { setModalInitRoom(""); setModalInitDate(""); setModalBanquet(null); setModalOpen(true); }} className="w-full sm:w-auto shrink-0 flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white hover:bg-blue-700 font-medium text-sm rounded-lg shadow-sm"><Plus size={16} /> Thêm đặt tiệc</button>
           </div>
 
           {/* Cards Tổng quan */}
@@ -529,25 +529,25 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
           })()}
 
           {/* Bộ lọc timeline */}
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-3">
-              <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden text-sm shadow-sm font-medium">
-                <button className="px-3 py-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50"><ChevronLeft size={16} /></button>
-                <div className="flex items-center px-4 py-2 text-slate-700 border-x border-slate-100">
-                   <input type="month" value={filterMonth} onChange={e => { setFilterMonth(e.target.value); setPage(1); }} className="bg-transparent border-none outline-none p-0 w-auto m-0 text-sm font-semibold" style={{minWidth: "120px"}} />
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between pt-2 gap-3">
+            <div className="flex items-center gap-2 md:gap-3 w-full sm:w-auto">
+              <div className="flex items-center border border-slate-200 rounded-lg bg-white overflow-hidden text-sm shadow-sm font-medium flex-1 sm:flex-none">
+                <button className="px-2 md:px-3 py-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50"><ChevronLeft size={16} /></button>
+                <div className="flex items-center px-2 md:px-4 py-2 text-slate-700 border-x border-slate-100 flex-1 justify-center">
+                   <input type="month" value={filterMonth} onChange={e => { setFilterMonth(e.target.value); setPage(1); }} className="bg-transparent border-none outline-none p-0 w-auto m-0 text-sm font-semibold max-w-[100px] md:max-w-none text-center" />
                 </div>
-                <button className="px-3 py-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50"><ChevronRight size={16} /></button>
+                <button className="px-2 md:px-3 py-2 text-slate-400 hover:text-slate-700 hover:bg-slate-50"><ChevronRight size={16} /></button>
               </div>
-              <div className="h-[38px]">
-                <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }} className="h-full px-4 py-0 pl-4 pr-10 border border-slate-200 rounded-lg text-sm bg-white font-medium shadow-sm outline-none w-auto appearance-none cursor-pointer" style={{background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center`, backgroundColor: "white"}}>
-                  <option value="">Tất cả trạng thái</option>
+              <div className="h-[38px] w-[130px] sm:w-auto">
+                <select value={filterStatus} onChange={e => { setFilterStatus(e.target.value); setPage(1); }} className="h-full px-2 md:px-4 py-0 pl-2 pr-8 border border-slate-200 rounded-lg text-xs md:text-sm bg-white font-medium shadow-sm outline-none w-full appearance-none cursor-pointer" style={{background: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 8px center`, backgroundColor: "white"}}>
+                  <option value="">Tất cả</option>
                   {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                 </select>
               </div>
             </div>
             
-            <div className="flex px-4 py-2 border border-slate-200 bg-white rounded-[8px] text-sm text-slate-600 font-medium shadow-sm gap-2 items-center cursor-pointer hover:bg-slate-50">
-               <CalendarDays size={16} /> Lịch
+            <div className="flex justify-center px-4 py-2 border border-slate-200 bg-white rounded-lg text-sm text-slate-600 font-medium shadow-sm gap-2 items-center cursor-pointer hover:bg-slate-50">
+               <CalendarDays size={16} /> Lịch sự kiện
             </div>
           </div>
 
@@ -567,38 +567,34 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
                const daysText = daysLeft === 0 ? "Hôm nay" : daysLeft < 0 ? "Đã qua" : `${daysLeft} ngày nữa`;
                
                return (
-                 <div key={bk.id} onClick={() => { setModalBanquet(bk); setModalOpen(true); }} className="flex gap-6 py-4 px-4 hover:bg-slate-50/50 cursor-pointer transition-colors group">
+                 <div key={bk.id} onClick={() => { setModalBanquet(bk); setModalOpen(true); }} className="flex gap-3 md:gap-6 py-4 px-3 md:px-4 hover:bg-slate-50/50 cursor-pointer transition-colors group">
                    {/* Column 1: Date Box */}
-                   <div className="flex flex-col items-center justify-start min-w-[50px] pt-1">
+                   <div className="flex flex-col items-center justify-start min-w-[40px] md:min-w-[50px] pt-1">
                      <span className="text-[17px] font-bold text-slate-800 leading-none">{day}</span>
-                     <span className="text-[10px] text-slate-500 font-semibold mt-1 whitespace-nowrap">{monthTitle}</span>
+                     <span className="text-[9px] md:text-[10px] text-slate-500 font-semibold mt-1 whitespace-nowrap">{monthTitle}</span>
                    </div>
                    
                    {/* Column 2: Event Details */}
-                   <div className="flex-1">
-                     <h3 className="text-[14px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors mb-1.5">{bk.eventType}</h3>
-                     <div className="flex items-center gap-2 text-slate-500 text-[12px] font-medium mb-1.5 flex-wrap">
-                       <span className="flex items-center gap-1.5"><Clock size={12} /> {bk.eventTime}</span>
-                       <span className="text-slate-300">•</span>
-                       <span className="flex items-center gap-1.5"><Users size={12} /> {bk.guestCount} khách</span>
+                   <div className="flex-1 min-w-0 flex flex-col justify-center">
+                     <h3 className="text-[13px] md:text-[14px] font-bold text-slate-800 group-hover:text-blue-600 transition-colors mb-1 truncate">{bk.eventType}</h3>
+                     <div className="flex items-center gap-1.5 md:gap-2 text-slate-500 text-[11px] md:text-[12px] font-medium mb-1.5 flex-wrap">
+                       <span className="flex items-center gap-1 md:gap-1.5"><Clock size={12} /> {bk.eventTime}</span>
+                       <span className="flex items-center gap-1 md:gap-1.5"><Users size={12} /> {bk.guestCount} khách</span>
                        {bk.room?.name && (
-                         <>
-                           <span className="text-slate-300">•</span>
-                           <span className="flex items-center gap-1.5 text-slate-600 bg-slate-100 px-2 py-0.5 rounded-full"><MapPin size={11} /> {bk.room.name}</span>
-                         </>
+                         <span className="flex items-center gap-1 md:gap-1.5 text-slate-600 bg-slate-100 px-1.5 md:px-2 py-0.5 rounded-full truncate max-w-[120px]"><MapPin size={11} className="shrink-0"/> <span className="truncate">{bk.room.name}</span></span>
                        )}
                      </div>
-                     <div className="flex items-center gap-1.5 text-slate-500 text-[12px]">
-                       <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center shrink-0"><Users size={10} className="text-slate-500"/></span>
-                       <span className="font-semibold text-slate-700">{bk.customerName}</span> · {bk.customerPhone || "Chưa có SĐT"}
+                     <div className="flex items-center gap-1 md:gap-1.5 text-slate-500 text-[11px] md:text-[12px] truncate">
+                       <span className="w-4 h-4 rounded-full bg-slate-200 flex items-center justify-center shrink-0 hidden sm:flex"><Users size={10} className="text-slate-500"/></span>
+                       <span className="font-semibold text-slate-700 truncate">{bk.customerName}</span><span className="hidden sm:inline"> · {bk.customerPhone || "Chưa có SĐT"}</span>
                      </div>
                    </div>
 
                    {/* Column 3: Status & Price */}
-                   <div className="text-right flex flex-col items-end gap-1 justify-center min-w-[120px]">
-                     <span className={`px-2.5 py-1 rounded-full text-[10px] ${displayStatusStyle}`}>{STATUS_CONFIG[bk.status]?.badgeText || bk.status}</span>
-                     <span className={`font-bold mt-1 text-[13px] ${displayPriceClass}`}>{formatPrice(bk.totalPrice || (bk.pricePerPerson ? bk.pricePerPerson * bk.guestCount : 0))}</span>
-                     <span className="text-[11px] font-semibold text-amber-500">{daysText}</span>
+                   <div className="text-right flex flex-col items-end gap-1 justify-center min-w-[70px] md:min-w-[120px] shrink-0">
+                     <span className={`px-2 py-0.5 md:px-2.5 md:py-1 rounded-full text-[9px] md:text-[10px] whitespace-nowrap ${displayStatusStyle}`}>{STATUS_CONFIG[bk.status]?.badgeText || bk.status}</span>
+                     <span className={`font-bold mt-1 text-[11px] md:text-[13px] whitespace-nowrap ${displayPriceClass}`}>{formatPrice(bk.totalPrice || (bk.pricePerPerson ? bk.pricePerPerson * bk.guestCount : 0))}</span>
+                     <span className="text-[10px] md:text-[11px] font-semibold text-amber-500">{daysText}</span>
                    </div>
                  </div>
                );
