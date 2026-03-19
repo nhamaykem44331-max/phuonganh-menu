@@ -78,6 +78,8 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
   const isEdit = !!item?.id;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiError, setAiError] = useState("");
   const [form, setForm] = useState({
     name: item?.name ?? "",
     nameEn: item?.nameEn ?? "",
@@ -97,6 +99,45 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
       ...f,
       tags: f.tags.includes(tag) ? f.tags.filter((t) => t !== tag) : [...f.tags, tag],
     }));
+  };
+
+  const handleAISuggest = async () => {
+    if (!form.name.trim()) {
+      setAiError("Vui lòng nhập tên món trước");
+      return;
+    }
+    
+    setAiLoading(true);
+    setAiError("");
+    
+    try {
+      const res = await fetch("/api/admin/ai-suggest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: form.name }),
+      });
+      
+      const json = await res.json();
+      
+      if (!res.ok) throw new Error(json.error);
+      
+      const { nameEn, description, descriptionEn, imageUrl } = json.data;
+      
+      setForm((f) => ({
+        ...f,
+        nameEn: nameEn || f.nameEn,
+        description: description || f.description,
+        descriptionEn: descriptionEn || f.descriptionEn,
+        imageUrl: imageUrl || f.imageUrl,
+      }));
+      
+    } catch (err) {
+      setAiError(
+        err instanceof Error ? err.message : "Lỗi AI, thử lại nhé"
+      );
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -205,6 +246,52 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
                   className="w-full px-3 py-2.5 text-sm font-semibold text-slate-800 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30 transition-shadow"
                   placeholder="Ví dụ: Gà quay hoàng gia"
                 />
+
+                {/* Nút AI Điền */}
+                <div className="flex items-center gap-2 mt-2">
+                  <button
+                    type="button"
+                    onClick={handleAISuggest}
+                    disabled={aiLoading || !form.name.trim()}
+                    className={`
+                      flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold
+                      transition-all duration-200
+                      ${aiLoading || !form.name.trim()
+                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
+                        : "bg-gradient-to-r from-violet-500 to-indigo-500 text-white hover:from-violet-600 hover:to-indigo-600 shadow-sm hover:shadow-md active:scale-95"
+                      }
+                    `}
+                  >
+                    {aiLoading ? (
+                      <>
+                        <svg className="animate-spin w-3 h-3" viewBox="0 0 24 24" fill="none">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" 
+                            stroke="currentColor" strokeWidth="4"/>
+                          <path className="opacity-75" fill="currentColor" 
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                        </svg>
+                        AI đang xử lý...
+                      </>
+                    ) : (
+                      <>
+                        ✨ AI Điền tự động
+                      </>
+                    )}
+                  </button>
+                  
+                  {!aiLoading && form.name.trim() && (
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      AI điền: Tên EN, Mô tả, Ảnh
+                    </span>
+                  )}
+                </div>
+
+                {/* Hiển thị lỗi AI */}
+                {aiError && (
+                  <p className="text-xs text-red-500 mt-1 flex items-center gap-1 font-medium">
+                    ⚠️ {aiError}
+                  </p>
+                )}
               </div>
 
               <div>
@@ -256,23 +343,46 @@ function MenuItemModal({ item, categories, onClose, onSaved, onDuplicate }: Moda
                 <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
                   Hình ảnh minh họa
                 </label>
-                <div className="flex gap-3 items-start">
-                  <div className="flex-1">
-                    <input
-                      value={form.imageUrl}
-                      onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
-                      className="w-full px-3 py-2.5 text-sm font-medium text-slate-800 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30"
-                      placeholder="https://res.cloudinary.com/..."
-                    />
-                  </div>
-                  <div className="w-16 h-16 rounded-xl border border-[var(--admin-border)] overflow-hidden bg-slate-50 shrink-0 relative flex items-center justify-center">
-                    {form.imageUrl ? (
-                      <Image src={form.imageUrl} alt="preview" fill className="object-cover" />
-                    ) : (
-                      <span className="text-[10px] text-slate-400 text-center font-medium">Trống</span>
+                <div className="relative">
+                  <input
+                    value={form.imageUrl}
+                    onChange={(e) => setForm((f) => ({ ...f, imageUrl: e.target.value }))}
+                    className="w-full px-3 py-2.5 pr-10 text-sm font-medium text-slate-800 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30"
+                    placeholder="https://res.cloudinary.com/..."
+                  />
+                  {form.imageUrl?.includes("pollinations.ai") && (
+                    <span className="absolute right-2 top-1/2 -translate-y-1/2 
+                      text-[10px] bg-violet-100 text-violet-600 px-1.5 py-0.5 rounded-full font-bold">
+                      AI
+                    </span>
+                  )}
+                </div>
+
+                {form.imageUrl && (
+                  <div className="mt-2.5 space-y-2">
+                    <div className="relative w-full h-32 rounded-xl overflow-hidden 
+                      border border-[var(--admin-border)] bg-slate-50 shadow-sm">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={form.imageUrl}
+                        alt="preview"
+                        className="relative w-full h-full object-cover z-10"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      {/* Loading overlay khi ảnh Pollinations đang load */}
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-50 text-xs text-slate-400 font-medium z-0">
+                        🖼️ Đang tải ảnh...
+                      </div>
+                    </div>
+                    {form.imageUrl?.includes("pollinations.ai") && (
+                      <p className="text-[11px] text-violet-600 flex items-center gap-1 font-semibold">
+                        ✨ Ảnh được tạo bởi AI — bạn có thể thay bằng URL khác
+                      </p>
                     )}
                   </div>
-                </div>
+                )}
               </div>
 
               <div>
