@@ -45,10 +45,23 @@ interface ModalProps {
   onSaved: (message: string) => void;
 }
 
+const SUGGESTED_ICONS = [
+  "🔥", "⭐", "✨", "👑", "💎", "💯", "🏆", "🌟",
+  "🍔", "🍕", "🍗", "🥩", "🥓", "🍖", "🌭", "🥪",
+  "🍜", "🍲", "🍛", "🍝", "🍱", "🍣", "🥗", "🥘",
+  "🌮", "🌯", "🥟", "🍤", "🍙", "🍘", "🍢", "🍳",
+  "🍰", "🍮", "🍦", "🍧", "🍨", "🍩", "🍪", "🎂",
+  "☕", "🍵", "🥤", "🧋", "🍹", "🍸", "🍷", "🍺", "🥂", "🧊",
+  "🌶️", "🥦", "🥬", "🌽", "🥕", "🥑", "🍆", "🍅", "🍄", "🧅",
+  "🐟", "🐠", "🦀", "🦞", "🐙", "🦑", "🦐", "🐡",
+  "🍎", "🍓", "🍉", "🍇", "🍌", "🍍", "🥭", "🥥"
+];
+
 function CategoryModal({ item, onClose, onSaved }: ModalProps) {
   const isEdit = !!item?.id;
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [showIcons, setShowIcons] = useState(false);
   const [form, setForm] = useState({
     name: item?.name ?? "",
     nameEn: item?.nameEn ?? "",
@@ -102,7 +115,7 @@ function CategoryModal({ item, onClose, onSaved }: ModalProps) {
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-5 font-ui overflow-y-auto">
+        <div className="px-6 py-5 space-y-5 font-ui overflow-y-auto min-h-[300px]">
           {error && (
             <div className="bg-red-50 border border-red-200 text-red-600 text-sm font-medium px-4 py-3 rounded-xl flex items-start gap-3">
               <AlertCircle size={18} className="shrink-0 mt-0.5" />
@@ -136,16 +149,44 @@ function CategoryModal({ item, onClose, onSaved }: ModalProps) {
             </div>
 
             <div className="grid grid-cols-2 gap-4">
-              <div>
+              <div className="relative">
                 <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
-                  Icon (Emoji hoặc class)
+                  Icon (Emoji / Class)
                 </label>
                 <input
                   value={form.icon}
                   onChange={(e) => setForm((f) => ({ ...f, icon: e.target.value }))}
+                  onFocus={() => setShowIcons(true)}
                   className="w-full px-3 py-2.5 text-sm font-medium text-slate-800 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30"
                   placeholder="🔥, 🥦, 🍗"
                 />
+                
+                {/* Icon Picker Popover */}
+                {showIcons && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowIcons(false)} />
+                    <div className="absolute top-full left-0 mt-2 w-72 bg-white border border-slate-200 rounded-xl shadow-xl z-50 overflow-hidden">
+                      <div className="flex justify-between items-center px-3 py-2 border-b border-slate-100 bg-slate-50">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase">Gợi ý Icon</span>
+                        <button type="button" onClick={() => setShowIcons(false)} className="text-slate-400 hover:text-slate-600">
+                          <X size={14} />
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-8 gap-1 p-2 max-h-48 overflow-y-auto">
+                        {SUGGESTED_ICONS.map((icon) => (
+                          <button
+                            key={icon}
+                            type="button"
+                            onClick={() => { setForm(f => ({ ...f, icon })); setShowIcons(false); }}
+                            className="text-lg hover:bg-indigo-50 hover:scale-110 rounded transition-all flex items-center justify-center p-1.5 cursor-pointer"
+                          >
+                            {icon}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
               <div>
                 <label className="block text-[11px] font-bold text-slate-500 mb-1.5 uppercase tracking-wider">
@@ -155,7 +196,7 @@ function CategoryModal({ item, onClose, onSaved }: ModalProps) {
                   value={form.slug}
                   onChange={(e) => setForm((f) => ({ ...f, slug: e.target.value }))}
                   className="w-full px-3 py-2.5 text-sm font-medium text-slate-500 border border-[var(--admin-border)] rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--admin-primary)]/30 bg-slate-50"
-                  placeholder="Tuỳ chọn (tự động tạo nếu để trống)"
+                  placeholder="Tuy chọn (Auto nếu trống)"
                 />
               </div>
             </div>

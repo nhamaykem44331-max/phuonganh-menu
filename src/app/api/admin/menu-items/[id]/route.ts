@@ -15,7 +15,7 @@ const UpdateMenuItemSchema = z.object({
   descriptionEn: z.string().optional().nullable(),
   price: z.number().positive().optional(),
   originalPrice: z.number().positive().optional().nullable(),
-  imageUrl: z.string().url().optional().nullable(),
+  imageUrl: z.string().optional().nullable(),
   tags: z.array(z.string()).optional(),
   isAvailable: z.boolean().optional(),
   sortOrder: z.number().optional(),
