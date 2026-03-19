@@ -254,7 +254,7 @@ function BaoGiaContent() {
       <div 
         id="bao-gia-paper"
         ref={paperRef}
-        className="w-full max-w-[600px] flex flex-col m-1 sm:m-2 border-[3px] border-double border-[#C9A84C]/60 relative bg-[#FAF8F5] overflow-visible pb-3"
+        className="w-full max-w-[600px] flex flex-col m-1 sm:m-2 border-[3px] border-double border-[#C9A84C]/60 relative bg-[#FAF8F5] overflow-visible pb-3 flex-1 min-h-[700px] sm:min-h-[800px]"
       >
         {/* Corner ornaments */}
         <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-[#C9A84C]/60 -mt-[1px] -ml-[1px]" />
@@ -325,7 +325,7 @@ function BaoGiaContent() {
         </div>
 
         {/* Footer Section */}
-        <div className="px-4 sm:px-10 mt-1 pt-1 pb-2 shrink-0 relative z-10 w-full">
+        <div className="px-4 sm:px-10 mt-auto pt-1 pb-2 shrink-0 relative z-10 w-full">
            {/* Total Amount */}
            <div className="flex justify-between items-baseline border-t-2 border-[#4d3722] pt-2 mt-1">
               <span className="font-display font-extrabold text-[#4d3722] text-[13px] sm:text-[15px] uppercase tracking-tight">
