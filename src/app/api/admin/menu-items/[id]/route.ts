@@ -108,7 +108,7 @@ export async function PUT(
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json({
       success: true,
@@ -155,13 +155,13 @@ export async function DELETE(
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json({
       success: true,
       message: "Món đã được ẩn khỏi thực đơn",
     });
-  } catch {
+  } catch (error) {
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Lỗi server" },
       { status: 500 }

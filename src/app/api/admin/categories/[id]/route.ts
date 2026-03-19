@@ -40,7 +40,7 @@ export async function PUT(
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json({ success: true, data: updated, revalidated: true });
   } catch (error) {
@@ -65,7 +65,7 @@ export async function DELETE(
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json({ success: true, message: "Đã ẩn danh mục", revalidated: true });
   } catch {

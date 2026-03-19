@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json({ success: true, data: newCategory, revalidated: true }, { status: 201 });
   } catch (error) {

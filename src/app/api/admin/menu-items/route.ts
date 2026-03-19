@@ -127,7 +127,7 @@ export async function POST(request: NextRequest) {
 
     revalidatePath("/");
     revalidatePath("/(menu)");
-    revalidateTag("menu-data");
+    revalidateTag("menu-data", "max");
 
     return NextResponse.json(
       {
