@@ -8,51 +8,58 @@ import { MenuClient } from "@/components/menu/MenuClient";
 import { CartDrawer } from "@/components/menu/CartDrawer";
 import { CartFloatButton } from "@/components/menu/CartFloatButton";
 
-// Fetch dữ liệu trên server — SSR cho SEO tốt
-async function getMenuData() {
-  const [categories, menuItems, banners] = await Promise.all([
-    prisma.category.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: "asc" },
-    }),
-    prisma.menuItem.findMany({
-      where: { isAvailable: true },
-      include: {
-        category: { select: { id: true, slug: true, name: true } },
-      },
-      orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
-    }),
-    prisma.banner.findMany({
-      where: {
-        isActive: true,
-        OR: [
-          { validFrom: null },
-          { validFrom: { lte: new Date() } },
-        ],
-        AND: [
-          {
-            OR: [
-              { validTo: null },
-              { validTo: { gte: new Date() } },
-            ],
-          },
-        ],
-      },
-      orderBy: { sortOrder: "asc" },
-    }),
-  ]);
+import { unstable_cache } from "next/cache";
 
-  return {
-    categories,
-    // Convert Decimal → number để pass xuống client component
-    menuItems: menuItems.map((item) => ({
-      ...item,
-      price: Number(item.price),
-      originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
-    })),
-    banners,
-  };
-}
+// Fetch dữ liệu trên server — Cache + Revalidate
+const getMenuData = unstable_cache(
+  async () => {
+    const [categories, menuItems, banners] = await Promise.all([
+      prisma.category.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: "asc" },
+      }),
+      prisma.menuItem.findMany({
+        where: { isAvailable: true },
+        include: {
+          category: { select: { id: true, slug: true, name: true } },
+        },
+        orderBy: [{ sortOrder: "asc" }, { name: "asc" }],
+      }),
+      prisma.banner.findMany({
+        where: {
+          isActive: true,
+          OR: [
+            { validFrom: null },
+            { validFrom: { lte: new Date() } },
+          ],
+          AND: [
+            {
+              OR: [
+                { validTo: null },
+                { validTo: { gte: new Date() } },
+              ],
+            },
+          ],
+        },
+        orderBy: { sortOrder: "asc" },
+      }),
+    ]);
+
+    return {
+      categories,
+      menuItems: menuItems.map((item) => ({
+        ...item,
+        price: Number(item.price),
+        originalPrice: item.originalPrice ? Number(item.originalPrice) : null,
+      })),
+      banners,
+    };
+  },
+  ["menu-data"],
+  { revalidate: 300, tags: ["menu-data"] }
+);
+
+// getMenuData is above
 
 export default async function MenuPage() {
   const { categories, menuItems, banners } = await getMenuData();

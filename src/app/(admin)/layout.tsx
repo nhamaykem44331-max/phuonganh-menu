@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
-export default async function AdminLayout({
+export default async function AdminRootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,9 +14,9 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-[var(--admin-bg)]">
       <AdminSidebar user={session.user} />
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {children}
       </main>
     </div>

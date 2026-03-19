@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const UpdateMenuItemSchema = z.object({
   categoryId: z.string().optional(),
@@ -100,6 +101,10 @@ export async function PUT(
       },
     });
 
+    revalidatePath("/");
+    revalidatePath("/(menu)");
+    revalidateTag("menu-data");
+
     return NextResponse.json({
       success: true,
       data: {
@@ -137,6 +142,10 @@ export async function DELETE(
       where: { id: params.id },
       data: { isAvailable: false },
     });
+
+    revalidatePath("/");
+    revalidatePath("/(menu)");
+    revalidateTag("menu-data");
 
     return NextResponse.json({
       success: true,

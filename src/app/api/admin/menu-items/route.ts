@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 import { z } from "zod";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 // =============================================
 // VALIDATION
@@ -120,6 +121,10 @@ export async function POST(request: NextRequest) {
         category: { select: { id: true, name: true, slug: true } },
       },
     });
+
+    revalidatePath("/");
+    revalidatePath("/(menu)");
+    revalidateTag("menu-data");
 
     return NextResponse.json(
       {

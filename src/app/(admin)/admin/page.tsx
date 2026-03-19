@@ -4,7 +4,7 @@
 import { prisma } from "@/lib/prisma";
 import {
   ShoppingBag, TrendingUp, Users, UtensilsCrossed,
-  ArrowUpRight, ArrowDownRight, Clock,
+  ArrowUpRight, ArrowDownRight, Clock, CalendarCheck
 } from "lucide-react";
 import { DashboardChart } from "@/components/admin/DashboardChart";
 
@@ -128,65 +128,66 @@ export default async function AdminDashboardPage() {
       label: "Doanh thu hôm nay",
       value: formatPrice(stats.todayRevenue),
       icon: TrendingUp,
-      color: "bg-jade text-white",
+      gradient: "bg-gradient-to-br from-indigo-500 to-indigo-700 shadow-indigo-500/30",
       change: stats.revGrowth,
     },
     {
       label: "Đơn hôm nay",
       value: stats.todayOrders.toString(),
       icon: ShoppingBag,
-      color: "bg-terra text-white",
+      gradient: "bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-emerald-500/30",
       change: null,
     },
     {
       label: "Tổng khách hàng",
       value: stats.customerCount.toLocaleString(),
       icon: Users,
-      color: "bg-gold text-white",
+      gradient: "bg-gradient-to-br from-amber-500 to-amber-600 shadow-amber-500/30",
+      change: null,
+    },
+    {
+      label: "Tiệc & Sự kiện",
+      value: "0", // Fallback for now if no banquet stats
+      icon: CalendarCheck,
+      gradient: "bg-gradient-to-br from-rose-500 to-rose-700 shadow-rose-500/30",
       change: null,
     },
   ];
 
   return (
     <div className="p-6 space-y-6">
-      {/* Page header */}
-      <div>
-        <h1 className="font-display text-2xl text-ink">Dashboard</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          {new Date().toLocaleDateString("vi-VN", {
-            weekday: "long", year: "numeric", month: "long", day: "numeric",
-          })}
-        </p>
+      <div className="hidden">
+        {/* Placeholder title as top bar AdminHeader takes care of this */}
       </div>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        {statCards.map(({ label, value, icon: Icon, color, change }) => (
-          <div key={label} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {statCards.map(({ label, value, icon: Icon, gradient, change }) => (
+          <div key={label} className={`rounded-2xl p-6 shadow-lg text-white relative overflow-hidden ${gradient}`}>
+            {/* Background pattern */}
+            <div className="absolute right-0 top-0 w-32 h-32 bg-white/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+            <div className="flex flex-col relative z-10">
+              <div className="flex items-start justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wider text-white/80 font-ui">
                   {label}
                 </p>
-                <p className="font-display text-2xl font-bold text-ink mt-1">{value}</p>
-                {change !== null && (
-                  <div
-                    className={`flex items-center gap-1 text-xs mt-1 font-medium ${
-                      change >= 0 ? "text-green-600" : "text-red-500"
-                    }`}
-                  >
-                    {change >= 0 ? (
-                      <ArrowUpRight size={13} />
-                    ) : (
-                      <ArrowDownRight size={13} />
-                    )}
-                    {Math.abs(change).toFixed(1)}% so với hôm qua
-                  </div>
-                )}
+                <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center backdrop-blur-sm">
+                  <Icon size={18} className="text-white" strokeWidth={2.5} />
+                </div>
               </div>
-              <div className={`w-11 h-11 rounded-2xl ${color} flex items-center justify-center`}>
-                <Icon size={20} />
-              </div>
+              <p className="font-display text-3xl font-bold mt-4 tracking-tight drop-shadow-sm">{value}</p>
+              
+              {/* Optional Change Indicator */}
+              {change !== null && (
+                <div
+                  className={`flex items-center gap-1 text-[11px] mt-2 font-semibold font-ui px-2.5 py-1 rounded-full w-fit backdrop-blur-md ${
+                    change >= 0 ? "bg-white/20 text-white" : "bg-red-900/40 text-red-100"
+                  }`}
+                >
+                  {change >= 0 ? <ArrowUpRight size={13} /> : <ArrowDownRight size={13} />}
+                  {Math.abs(change).toFixed(1)}% so với hôm qua
+                </div>
+              )}
             </div>
           </div>
         ))}

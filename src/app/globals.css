@@ -31,6 +31,18 @@
     --accent:      var(--gold);
     --accent-fg:   255 255 255;
 
+    /* Admin RMS tokens */
+    --admin-bg: #F8F9FA;
+    --admin-sidebar: #1C1F2E;
+    --admin-sidebar-text: #A8B2D8;
+    --admin-sidebar-active: #4F46E5;
+    --admin-card: #FFFFFF;
+    --admin-border: #E2E8F0;
+    --admin-primary: #4F46E5;
+    --admin-success: #10B981;
+    --admin-warning: #F59E0B;
+    --admin-danger: #EF4444;
+
     /* shadcn/ui compatibility */
     --radius: 0.375rem; /* 6px */
   }
