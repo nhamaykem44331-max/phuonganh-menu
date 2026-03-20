@@ -62,6 +62,21 @@ const formatDate = (iso: string) => {
   return new Date(iso).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
 };
 
+const toBusinessDateKey = (iso: string) => {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Ho_Chi_Minh",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date(iso));
+
+  const year = parts.find((p) => p.type === "year")?.value ?? "1970";
+  const month = parts.find((p) => p.type === "month")?.value ?? "01";
+  const day = parts.find((p) => p.type === "day")?.value ?? "01";
+
+  return `${year}-${month}-${day}`;
+};
+
 // ─── Components: BANQUET MODAL ────────────────────────────────────────────────
 function BanquetModal({
   banquet, initialRoomId, initialDate, rooms, users, onClose, onSave
@@ -75,7 +90,7 @@ function BanquetModal({
     customerEmail: banquet?.customerEmail || "",
     companyName: banquet?.companyName || "",
     roomId: banquet?.roomId || initialRoomId || (rooms[0]?.id ?? ""),
-    eventDate: banquet ? banquet.eventDate.split("T")[0] : initialDate || new Date().toISOString().split("T")[0],
+    eventDate: banquet ? toBusinessDateKey(banquet.eventDate) : initialDate || toBusinessDateKey(new Date().toISOString()),
     eventTime: banquet?.eventTime || "17:30",
     eventType: banquet?.eventType || "Tiệc liên hoan",
     guestCount: banquet?.guestCount || 0,
@@ -99,7 +114,7 @@ function BanquetModal({
     setSaving(true);
     const payload = {
       ...form, status: asDraft ? "INQUIRY" : form.status,
-      eventDate: `${form.eventDate}T${form.eventTime}:00.000Z`,
+      eventDate: new Date(`${form.eventDate}T${form.eventTime}:00`).toISOString(),
       guestCount: Number(form.guestCount), tableCount: Number(form.tableCount),
       pricePerPerson: form.pricePerPerson ? Number(form.pricePerPerson) : null,
       depositAmount: form.depositAmount ? Number(form.depositAmount) : null,
@@ -353,8 +368,8 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
   const [roomModalItem, setRoomModalItem] = useState<Room | null>(null);
 
   const [exportModalOpen, setExportModalOpen] = useState(false);
-  const [exportFrom, setExportFrom] = useState(() => { const d = new Date(); d.setDate(1); return d.toISOString().split("T")[0]; });
-  const [exportTo, setExportTo] = useState(() => { const d = new Date(); d.setMonth(d.getMonth() + 1, 0); return d.toISOString().split("T")[0]; });
+  const [exportFrom, setExportFrom] = useState(() => { const d = new Date(); d.setDate(1); return toBusinessDateKey(d.toISOString()); });
+  const [exportTo, setExportTo] = useState(() => { const d = new Date(); d.setMonth(d.getMonth() + 1, 0); return toBusinessDateKey(d.toISOString()); });
   const [exporting, setExporting] = useState(false);
 
   const fetchRooms = useCallback(async () => {
@@ -413,7 +428,7 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
         const d = new Date(from);
         d.setDate(d.getDate() + i);
         dateHeaders.push(d.toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit" }));
-        dateStrings.push(d.toISOString().split("T")[0]);
+        dateStrings.push(toBusinessDateKey(d.toISOString()));
       }
 
       const headers = ["Phòng / Sảnh", ...dateHeaders];
@@ -421,7 +436,7 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
       const csvRows = rooms.map(room => {
         const row = [room.name];
         for (const dateStr of dateStrings) {
-          const bks = banquets.filter((b: any) => b.roomId === room.id && b.eventDate.startsWith(dateStr));
+          const bks = banquets.filter((b: any) => b.roomId === room.id && toBusinessDateKey(b.eventDate) === dateStr);
           if (bks.length === 0) row.push("");
           else {
             const cellText = bks.map((bk: any) => `[${bk.eventTime}] ${bk.customerName} (${bk.guestCount} khách)`).join("\n");
@@ -435,7 +450,7 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
       if (unassignedBks.length > 0) {
           const row = ["CHƯA XẾP PHÒNG"];
           for (const dateStr of dateStrings) {
-            const bks = unassignedBks.filter((b: any) => b.eventDate.startsWith(dateStr));
+            const bks = unassignedBks.filter((b: any) => toBusinessDateKey(b.eventDate) === dateStr);
             if (bks.length === 0) row.push("");
             else row.push(bks.map((bk: any) => `[${bk.eventTime}] ${bk.customerName} (${bk.guestCount} khách)`).join("\n"));
           }
@@ -716,7 +731,7 @@ export function BanquetsAdminClient({ initialRooms, initialUsers }: { initialRoo
                       </td>
                       {timelineDays.map(d => {
                         const dateStr = `${timelineYear}-${String(timelineMonth).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
-                        const bks = timelineData.bookings.filter(b => b.roomId === room.id && b.eventDate.startsWith(dateStr));
+                        const bks = timelineData.bookings.filter(b => b.roomId === room.id && toBusinessDateKey(b.eventDate) === dateStr);
                         return (
                           <td key={d} onClick={e => { if ((e.target as HTMLElement).closest('.bk-card')) return; setModalBanquet(null); setModalInitRoom(room.id); setModalInitDate(dateStr); setModalOpen(true); }} className="border border-slate-200 p-1.5 h-[80px] min-w-[100px] align-top hover:bg-blue-50/50 cursor-pointer relative">
                             <div className="flex flex-col gap-1.5 h-full relative">
