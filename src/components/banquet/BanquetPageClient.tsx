@@ -1,4 +1,4 @@
-// src/components/banquet/BanquetPageClient.tsx
+﻿// src/components/banquet/BanquetPageClient.tsx
 "use client";
 
 import { useState } from "react";
@@ -16,12 +16,12 @@ import {
 const getRoomImage = (roomName: string): string => {
   const name = roomName.toLowerCase();
   if (name.includes('vip') || name.includes('sen')) return '/spaces/phong-vip.jpg';
-  if (name.includes('vườn') || name.includes('ngoài trời') || name.includes('sân')) return '/spaces/san-vuon.jpg';
-  if (name.includes('tiệc') || name.includes('cưới') || name.includes('sảnh') || name.includes('hội')) return '/spaces/sanh-tiec.jpg';
+  if (name.includes('vÆ°á»n') || name.includes('ngoÃ i trá»i') || name.includes('sÃ¢n')) return '/spaces/san-vuon.jpg';
+  if (name.includes('tiá»‡c') || name.includes('cÆ°á»›i') || name.includes('sáº£nh') || name.includes('há»™i')) return '/spaces/sanh-tiec.jpg';
   return '/spaces/bar-lounge.jpg';
 };
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Types â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 interface Room {
   id: string;
   name: string;
@@ -40,7 +40,7 @@ interface MenuItem {
   imageUrl: string | null;
 }
 
-// ─── Set Menu Tiers ───────────────────────────────────────────────────────────
+// â”€â”€â”€ Set Menu Tiers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const SET_MENU_TIERS = [
   {
     id: "A",
@@ -51,8 +51,8 @@ const SET_MENU_TIERS = [
     activeColor: "border-amber-500 bg-amber-100 ring-2 ring-amber-400",
     badgeColor: "bg-amber-500",
     dishes: 6,
-    description: "Tiệc cơ bản — 6 món chọn lọc",
-    includes: ["2 món khai vị", "2 món chính", "1 món cơm/bún", "Tráng miệng"],
+    description: "Tiá»‡c cÆ¡ báº£n â€” 6 mÃ³n chá»n lá»c",
+    includes: ["2 mÃ³n khai vá»‹", "2 mÃ³n chÃ­nh", "1 mÃ³n cÆ¡m/bÃºn", "TrÃ¡ng miá»‡ng"],
   },
   {
     id: "B",
@@ -63,8 +63,8 @@ const SET_MENU_TIERS = [
     activeColor: "border-jade bg-jade-light ring-2 ring-jade",
     badgeColor: "bg-jade",
     dishes: 8,
-    description: "Tiệc nâng cao — 8 món cao cấp",
-    includes: ["3 món khai vị", "3 món chính", "1 món lẩu/nướng", "Cơm + Tráng miệng"],
+    description: "Tiá»‡c nÃ¢ng cao â€” 8 mÃ³n cao cáº¥p",
+    includes: ["3 mÃ³n khai vá»‹", "3 mÃ³n chÃ­nh", "1 mÃ³n láº©u/nÆ°á»›ng", "CÆ¡m + TrÃ¡ng miá»‡ng"],
   },
   {
     id: "C",
@@ -75,45 +75,45 @@ const SET_MENU_TIERS = [
     activeColor: "border-terra bg-terra-light ring-2 ring-terra",
     badgeColor: "bg-terra",
     dishes: 10,
-    description: "Tiệc VIP — 10 món + đồ uống",
-    includes: ["4 món khai vị", "3 món chính hải sản", "Lẩu đặc biệt", "Cơm + Tráng miệng + Đồ uống"],
+    description: "Tiá»‡c VIP â€” 10 mÃ³n + Ä‘á»“ uá»‘ng",
+    includes: ["4 mÃ³n khai vá»‹", "3 mÃ³n chÃ­nh háº£i sáº£n", "Láº©u Ä‘áº·c biá»‡t", "CÆ¡m + TrÃ¡ng miá»‡ng + Äá»“ uá»‘ng"],
   },
   {
     id: "custom",
-    label: "Tự chọn",
+    label: "Tá»± chá»n",
     icon: Utensils,
     pricePerPerson: 0,
     color: "border-gray-200 bg-gray-50",
     activeColor: "border-gray-400 bg-gray-100 ring-2 ring-gray-400",
     badgeColor: "bg-gray-500",
     dishes: 0,
-    description: "Tự chọn từng món theo ý muốn",
+    description: "Tá»± chá»n tá»«ng mÃ³n theo Ã½ muá»‘n",
     includes: [],
   },
 ];
 
 const EVENT_TYPES = [
-  "Tiệc cưới", "Tiệc sinh nhật", "Tiệc thôi nôi",
-  "Hội nghị / Hội thảo", "Liên hoan công ty",
-  "Gặp mặt gia đình", "Tiệc tất niên / tân niên",
-  "Sự kiện khác",
+  "Tiá»‡c cÆ°á»›i", "Tiá»‡c sinh nháº­t", "Tiá»‡c thÃ´i nÃ´i",
+  "Há»™i nghá»‹ / Há»™i tháº£o", "LiÃªn hoan cÃ´ng ty",
+  "Gáº·p máº·t gia Ä‘Ã¬nh", "Tiá»‡c táº¥t niÃªn / tÃ¢n niÃªn",
+  "Sá»± kiá»‡n khÃ¡c",
 ];
 
 const EQUIPMENT_ICONS: Record<string, string> = {
-  projector: "📽️", microphone: "🎤", ac: "❄️",
-  sound: "🔊", lighting: "💡", stage: "🎭",
-  wifi: "📶", parking: "🅿️",
+  projector: "ðŸ“½ï¸", microphone: "ðŸŽ¤", ac: "â„ï¸",
+  sound: "ðŸ”Š", lighting: "ðŸ’¡", stage: "ðŸŽ­",
+  wifi: "ðŸ“¶", parking: "ðŸ…¿ï¸",
 };
 
-// ─── Form Schema ──────────────────────────────────────────────────────────────
+// â”€â”€â”€ Form Schema â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const FormSchema = z.object({
-  customerName: z.string().min(2, "Tên tối thiểu 2 ký tự"),
-  customerPhone: z.string().regex(/^(0|\+84)[0-9]{8,10}$/, "SĐT không hợp lệ"),
-  customerEmail: z.string().email("Email không hợp lệ").optional().or(z.literal("")),
-  eventType: z.string().min(1, "Vui lòng chọn loại sự kiện"),
-  eventDate: z.string().min(1, "Vui lòng chọn ngày"),
-  eventTime: z.string().min(1, "Vui lòng chọn giờ"),
-  guestCount: z.coerce.number().min(10, "Tối thiểu 10 khách").max(1000),
+  customerName: z.string().min(2, "TÃªn tá»‘i thiá»ƒu 2 kÃ½ tá»±"),
+  customerPhone: z.string().regex(/^(0|\+84)[0-9]{8,10}$/, "SÄT khÃ´ng há»£p lá»‡"),
+  customerEmail: z.string().email("Email khÃ´ng há»£p lá»‡").optional().or(z.literal("")),
+  eventType: z.string().min(1, "Vui lÃ²ng chá»n loáº¡i sá»± kiá»‡n"),
+  eventDate: z.string().min(1, "Vui lÃ²ng chá»n ngÃ y"),
+  eventTime: z.string().min(1, "Vui lÃ²ng chá»n giá»"),
+  guestCount: z.coerce.number().min(10, "Tá»‘i thiá»ƒu 10 khÃ¡ch").max(1000),
   roomId: z.string().optional(),
   note: z.string().max(500).optional(),
 });
@@ -126,7 +126,7 @@ function formatPrice(n: number) {
   }).format(n);
 }
 
-// ─── Room Card ────────────────────────────────────────────────────────────────
+// â”€â”€â”€ Room Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function RoomCard({
   room, selected, onSelect,
 }: {
@@ -149,7 +149,7 @@ function RoomCard({
         {roomDisplayImage ? (
           <Image src={roomDisplayImage} alt={room.name} fill className="object-cover" />
         ) : (
-          <div className="flex items-center justify-center h-full text-4xl opacity-20">🏛️</div>
+          <div className="flex items-center justify-center h-full text-4xl opacity-20">ðŸ›ï¸</div>
         )}
         {selected && (
           <div className="absolute top-2 right-2 bg-jade text-white rounded-full p-1">
@@ -164,11 +164,11 @@ function RoomCard({
         <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1.5">
           <span className="flex items-center gap-1">
             <Users size={12} />
-            Tối đa {room.capacity} khách
+            Tá»‘i Ä‘a {room.capacity} khÃ¡ch
           </span>
           {room.pricePerDay && (
             <span className="flex items-center gap-1 text-terra font-semibold">
-              {formatPrice(room.pricePerDay)}/ngày
+              {formatPrice(room.pricePerDay)}/ngÃ y
             </span>
           )}
         </div>
@@ -178,7 +178,7 @@ function RoomCard({
           <div className="flex flex-wrap gap-1 mt-2">
             {room.equipment.slice(0, showMore ? undefined : 4).map((eq) => (
               <span key={eq} className="text-[11px] bg-gray-100 px-2 py-0.5 rounded-full text-muted-foreground">
-                {EQUIPMENT_ICONS[eq] ?? "✓"} {eq}
+                {EQUIPMENT_ICONS[eq] ?? "âœ“"} {eq}
               </span>
             ))}
             {!showMore && room.equipment.length > 4 && (
@@ -186,7 +186,7 @@ function RoomCard({
                 onClick={(e) => { e.stopPropagation(); setShowMore(true); }}
                 className="text-[11px] text-jade underline"
               >
-                +{room.equipment.length - 4} thêm
+                +{room.equipment.length - 4} thÃªm
               </button>
             )}
           </div>
@@ -200,7 +200,7 @@ function RoomCard({
   );
 }
 
-// ─── Set Menu Tier Card ───────────────────────────────────────────────────────
+// â”€â”€â”€ Set Menu Tier Card â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function SetMenuCard({
   tier, selected, guestCount, onSelect,
 }: {
@@ -239,13 +239,13 @@ function SetMenuCard({
       {tier.pricePerPerson > 0 && (
         <p className="font-display text-xl font-bold text-jade mb-1">
           {formatPrice(tier.pricePerPerson)}
-          <span className="text-xs font-normal text-muted-foreground font-body"> /người</span>
+          <span className="text-xs font-normal text-muted-foreground font-body"> /ngÆ°á»i</span>
         </p>
       )}
 
       {tier.pricePerPerson > 0 && guestCount >= 10 && (
         <p className="text-xs font-semibold text-terra mb-3">
-          ≈ {formatPrice(total)} cho {guestCount} khách
+          â‰ˆ {formatPrice(total)} cho {guestCount} khÃ¡ch
         </p>
       )}
 
@@ -262,14 +262,14 @@ function SetMenuCard({
 
       {tier.id === "custom" && (
         <p className="text-xs text-muted-foreground">
-          Bạn sẽ chọn từng món ăn phù hợp với ngân sách riêng
+          Báº¡n sáº½ chá»n tá»«ng mÃ³n Äƒn phÃ¹ há»£p vá»›i ngÃ¢n sÃ¡ch riÃªng
         </p>
       )}
     </div>
   );
 }
 
-// ─── Custom Menu Picker ───────────────────────────────────────────────────────
+// â”€â”€â”€ Custom Menu Picker â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function CustomMenuPicker({
   menuItems,
   selected,
@@ -299,7 +299,7 @@ function CustomMenuPicker({
       {totalCustom > 0 && (
         <div className="bg-jade-light rounded-xl px-4 py-3 flex justify-between items-center">
           <span className="text-sm text-jade font-medium">
-            {selected.size} món đã chọn
+            {selected.size} mÃ³n Ä‘Ã£ chá»n
           </span>
           <span className="font-bold text-jade price-tag">
             {formatPrice(totalCustom)}
@@ -321,7 +321,7 @@ function CustomMenuPicker({
                 <span className="font-semibold text-sm text-ink">{catName}</span>
                 {selectedInCat > 0 && (
                   <span className="text-xs bg-jade text-white px-2 py-0.5 rounded-full">
-                    {selectedInCat} món
+                    {selectedInCat} mÃ³n
                   </span>
                 )}
               </div>
@@ -344,7 +344,7 @@ function CustomMenuPicker({
                             <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           </div>
                         ) : (
-                          <div className="w-9 h-9 rounded-lg bg-jade-light flex items-center justify-center text-base flex-shrink-0">🍽️</div>
+                          <div className="w-9 h-9 rounded-lg bg-jade-light flex items-center justify-center text-base flex-shrink-0">ðŸ½ï¸</div>
                         )}
                         <div className="min-w-0">
                           <p className="text-sm font-medium text-ink truncate">{item.name}</p>
@@ -362,7 +362,7 @@ function CustomMenuPicker({
                               onClick={() => onChange(item.id, qty - 1)}
                               className="w-7 h-7 rounded-lg bg-gray-100 text-gray-600 flex items-center justify-center hover:bg-gray-200 font-bold text-lg leading-none"
                             >
-                              −
+                              âˆ’
                             </button>
                             <span className="w-5 text-center text-sm font-bold tabular-nums">{qty}</span>
                             <button
@@ -377,7 +377,7 @@ function CustomMenuPicker({
                             onClick={() => onChange(item.id, 1)}
                             className="text-xs font-semibold px-3 py-1.5 border border-jade/40 text-jade rounded-lg hover:bg-jade-light transition-colors"
                           >
-                            Thêm
+                            ThÃªm
                           </button>
                         )}
                       </div>
@@ -393,7 +393,7 @@ function CustomMenuPicker({
   );
 }
 
-// ─── Main Page Component ──────────────────────────────────────────────────────
+// â”€â”€â”€ Main Page Component â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 export function BanquetPageClient({
   rooms,
   menuItems,
@@ -430,7 +430,7 @@ export function BanquetPageClient({
     });
   };
 
-  // Tính báo giá
+  // TÃ­nh bÃ¡o giÃ¡
   const tier = SET_MENU_TIERS.find((t) => t.id === selectedTier);
   const estimatedTotal =
     tier?.id === "custom"
@@ -465,6 +465,7 @@ export function BanquetPageClient({
         customerEmail: data.customerEmail,
         eventType: data.eventType,
         eventDate: eventDatetime.toISOString(),
+        eventTime: data.eventTime,
         guestCount: Number(data.guestCount),
         roomId: data.roomId || null,
         pricePerPerson: tier?.id !== "custom" ? tier?.pricePerPerson : null,
@@ -479,7 +480,7 @@ export function BanquetPageClient({
       });
 
       const json = await res.json();
-      if (!res.ok) throw new Error(json.error ?? "Lỗi gửi yêu cầu");
+      if (!res.ok) throw new Error(json.error ?? "Lá»—i gá»­i yÃªu cáº§u");
 
       setSuccess(json.message);
       reset();
@@ -487,7 +488,7 @@ export function BanquetPageClient({
       setCustomMenu(new Map());
       setStep(1);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Có lỗi xảy ra");
+      alert(err instanceof Error ? err.message : "CÃ³ lá»—i xáº£y ra");
     }
   };
 
@@ -498,24 +499,24 @@ export function BanquetPageClient({
           <div className="w-20 h-20 bg-jade-light rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle2 size={40} className="text-jade" />
           </div>
-          <h2 className="font-display text-3xl text-jade mb-3">Đã nhận yêu cầu!</h2>
+          <h2 className="font-display text-3xl text-jade mb-3">ÄÃ£ nháº­n yÃªu cáº§u!</h2>
           <p className="text-muted-foreground mb-8">{success}</p>
           <button
             onClick={() => setSuccess(null)}
             className="px-6 py-3 bg-jade text-white font-semibold rounded-2xl hover:bg-jade-mid transition-colors"
           >
-            Đặt tiệc khác
+            Äáº·t tiá»‡c khÃ¡c
           </button>
         </div>
       </div>
     );
   }
 
-  // ── Step indicators
+  // â”€â”€ Step indicators
   const STEPS = [
-    { n: 1 as const, label: "Thông tin" },
-    { n: 2 as const, label: "Chọn menu" },
-    { n: 3 as const, label: "Xác nhận" },
+    { n: 1 as const, label: "ThÃ´ng tin" },
+    { n: 2 as const, label: "Chá»n menu" },
+    { n: 3 as const, label: "XÃ¡c nháº­n" },
   ];
 
   return (
@@ -527,16 +528,16 @@ export function BanquetPageClient({
           <div className="flex items-center justify-center gap-2 mb-3">
             <PartyPopper size={24} className="text-gold" />
             <span className="text-gold font-semibold text-sm uppercase tracking-widest">
-              Tiệc & Sự kiện
+              Tiá»‡c & Sá»± kiá»‡n
             </span>
           </div>
           <h1 className="font-display text-4xl sm:text-5xl font-bold mb-4">
-            Tổ chức sự kiện<br />
-            <em className="text-gold">đáng nhớ</em>
+            Tá»• chá»©c sá»± kiá»‡n<br />
+            <em className="text-gold">Ä‘Ã¡ng nhá»›</em>
           </h1>
           <p className="text-white/75 text-lg max-w-xl mx-auto">
-            Nhà hàng Phương Anh — không gian sang trọng, ẩm thực chuẩn vị,
-            dịch vụ tận tâm cho ngày trọng đại của bạn.
+            NhÃ  hÃ ng PhÆ°Æ¡ng Anh â€” khÃ´ng gian sang trá»ng, áº©m thá»±c chuáº©n vá»‹,
+            dá»‹ch vá»¥ táº­n tÃ¢m cho ngÃ y trá»ng Ä‘áº¡i cá»§a báº¡n.
           </p>
         </div>
       </div>
@@ -545,12 +546,12 @@ export function BanquetPageClient({
       {rooms.length > 0 && (
         <section className="max-w-5xl mx-auto px-4 py-12">
           <h2 className="font-display text-2xl text-ink text-center mb-2">
-            Phòng & Sảnh tiệc
+            PhÃ²ng & Sáº£nh tiá»‡c
           </h2>
           <p className="text-center text-muted-foreground mb-8 text-sm">
-            {rooms.length} không gian — sức chứa {Math.min(...rooms.map((r) => r.capacity))}
-            {" – "}
-            {Math.max(...rooms.map((r) => r.capacity))} khách
+            {rooms.length} khÃ´ng gian â€” sá»©c chá»©a {Math.min(...rooms.map((r) => r.capacity))}
+            {" â€“ "}
+            {Math.max(...rooms.map((r) => r.capacity))} khÃ¡ch
           </p>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {rooms.map((room) => (
@@ -562,7 +563,7 @@ export function BanquetPageClient({
                       <img src={room.images[0] || getRoomImage(room.name)} alt={room.name} className="w-full h-full object-cover" />
                     </div>
                   ) : (
-                    <div className="flex items-center justify-center h-full text-5xl opacity-20">🏛️</div>
+                    <div className="flex items-center justify-center h-full text-5xl opacity-20">ðŸ›ï¸</div>
                   )}
                 </div>
                 <div className="p-4">
@@ -570,11 +571,11 @@ export function BanquetPageClient({
                   <div className="flex items-center gap-3 mt-1.5 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Users size={12} />
-                      {room.capacity} khách
+                      {room.capacity} khÃ¡ch
                     </span>
                     {room.pricePerDay && (
                       <span className="text-terra font-semibold">
-                        {formatPrice(room.pricePerDay)}/ngày
+                        {formatPrice(room.pricePerDay)}/ngÃ y
                       </span>
                     )}
                   </div>
@@ -582,7 +583,7 @@ export function BanquetPageClient({
                     <div className="flex flex-wrap gap-1 mt-2">
                       {room.equipment.slice(0, 5).map((eq) => (
                         <span key={eq} className="text-[10px] bg-gray-100 px-2 py-0.5 rounded-full">
-                          {EQUIPMENT_ICONS[eq] ?? "✓"} {eq}
+                          {EQUIPMENT_ICONS[eq] ?? "âœ“"} {eq}
                         </span>
                       ))}
                     </div>
@@ -598,10 +599,10 @@ export function BanquetPageClient({
       <section className="bg-jade-light py-14 px-4">
         <div className="max-w-2xl mx-auto">
           <h2 className="font-display text-3xl text-jade text-center mb-2">
-            Đặt tiệc ngay
+            Äáº·t tiá»‡c ngay
           </h2>
           <p className="text-center text-muted-foreground mb-8 text-sm">
-            Điền thông tin — chúng tôi sẽ liên hệ báo giá trong 2 giờ
+            Äiá»n thÃ´ng tin â€” chÃºng tÃ´i sáº½ liÃªn há»‡ bÃ¡o giÃ¡ trong 2 giá»
           </p>
 
           {/* Step indicator */}
@@ -627,7 +628,7 @@ export function BanquetPageClient({
                         : "bg-gray-200 text-gray-400"
                     }`}
                   >
-                    {step > n ? "✓" : n}
+                    {step > n ? "âœ“" : n}
                   </span>
                   <span className="hidden sm:inline">{label}</span>
                 </button>
@@ -642,21 +643,21 @@ export function BanquetPageClient({
           <div className="bg-white rounded-3xl shadow-sm border border-[rgb(var(--border))] overflow-hidden">
             <form onSubmit={handleSubmit(onSubmit)}>
 
-              {/* ── Step 1: Basic Info ── */}
+              {/* â”€â”€ Step 1: Basic Info â”€â”€ */}
               {step === 1 && (
                 <div className="p-6 space-y-4">
-                  <h3 className="font-display text-xl text-ink mb-4">Thông tin sự kiện</h3>
+                  <h3 className="font-display text-xl text-ink mb-4">ThÃ´ng tin sá»± kiá»‡n</h3>
 
                   {/* Event type */}
                   <div>
                     <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                      Loại sự kiện <span className="text-red-400">*</span>
+                      Loáº¡i sá»± kiá»‡n <span className="text-red-400">*</span>
                     </label>
                     <select
                       {...register("eventType")}
                       className="w-full px-3 py-2.5 text-sm border border-[rgb(var(--border))] rounded-xl focus:outline-none focus:ring-2 focus:ring-jade/30 bg-white"
                     >
-                      <option value="">— Chọn loại sự kiện —</option>
+                      <option value="">â€” Chá»n loáº¡i sá»± kiá»‡n â€”</option>
                       {EVENT_TYPES.map((t) => (
                         <option key={t} value={t}>{t}</option>
                       ))}
@@ -670,7 +671,7 @@ export function BanquetPageClient({
                   <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                        Ngày <span className="text-red-400">*</span>
+                        NgÃ y <span className="text-red-400">*</span>
                       </label>
                       <input
                         type="date"
@@ -684,13 +685,13 @@ export function BanquetPageClient({
                     </div>
                     <div>
                       <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                        Giờ <span className="text-red-400">*</span>
+                        Giá» <span className="text-red-400">*</span>
                       </label>
                       <select
                         {...register("eventTime")}
                         className="w-full px-3 py-2.5 text-sm border border-[rgb(var(--border))] rounded-xl focus:outline-none focus:ring-2 focus:ring-jade/30 bg-white"
                       >
-                        <option value="">— Chọn giờ —</option>
+                        <option value="">â€” Chá»n giá» â€”</option>
                         {["10:00","11:00","11:30","17:00","17:30","18:00","18:30","19:00"].map((t) => (
                           <option key={t} value={t}>{t}</option>
                         ))}
@@ -704,7 +705,7 @@ export function BanquetPageClient({
                   {/* Guest count */}
                   <div>
                     <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                      Số khách dự kiến <span className="text-red-400">*</span>
+                      Sá»‘ khÃ¡ch dá»± kiáº¿n <span className="text-red-400">*</span>
                     </label>
                     <div className="relative">
                       <Users size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -726,7 +727,7 @@ export function BanquetPageClient({
                   {rooms.length > 0 && (
                     <div>
                       <label className="block text-xs font-semibold text-muted-foreground mb-2 uppercase tracking-wide">
-                        Chọn phòng / sảnh
+                        Chá»n phÃ²ng / sáº£nh
                       </label>
                       <div className="grid sm:grid-cols-2 gap-3">
                         {rooms.map((room) => (
@@ -743,19 +744,19 @@ export function BanquetPageClient({
 
                   {/* Contact info */}
                   <div className="pt-2 border-t border-gray-100">
-                    <h4 className="font-semibold text-sm text-ink mb-3">Thông tin liên hệ</h4>
+                    <h4 className="font-semibold text-sm text-ink mb-3">ThÃ´ng tin liÃªn há»‡</h4>
                     <div className="space-y-3">
                       <div className="grid grid-cols-2 gap-3">
                         <div>
                           <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                            Họ tên <span className="text-red-400">*</span>
+                            Há» tÃªn <span className="text-red-400">*</span>
                           </label>
                           <div className="relative">
                             <User size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                             <input
                               {...register("customerName")}
                               className="w-full pl-9 pr-3 py-2.5 text-sm border border-[rgb(var(--border))] rounded-xl focus:outline-none focus:ring-2 focus:ring-jade/30"
-                              placeholder="Nguyễn Văn A"
+                              placeholder="Nguyá»…n VÄƒn A"
                             />
                           </div>
                           {errors.customerName && (
@@ -764,7 +765,7 @@ export function BanquetPageClient({
                         </div>
                         <div>
                           <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                            Điện thoại <span className="text-red-400">*</span>
+                            Äiá»‡n thoáº¡i <span className="text-red-400">*</span>
                           </label>
                           <div className="relative">
                             <Phone size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -782,7 +783,7 @@ export function BanquetPageClient({
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                          Email (nhận báo giá PDF)
+                          Email (nháº­n bÃ¡o giÃ¡ PDF)
                         </label>
                         <input
                           {...register("customerEmail")}
@@ -793,13 +794,13 @@ export function BanquetPageClient({
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">
-                          Ghi chú yêu cầu đặc biệt
+                          Ghi chÃº yÃªu cáº§u Ä‘áº·c biá»‡t
                         </label>
                         <textarea
                           {...register("note")}
                           rows={2}
                           className="w-full px-3 py-2.5 text-sm border border-[rgb(var(--border))] rounded-xl focus:outline-none focus:ring-2 focus:ring-jade/30 resize-none"
-                          placeholder="Trang trí đặc biệt, menu chay, dị ứng thực phẩm..."
+                          placeholder="Trang trÃ­ Ä‘áº·c biá»‡t, menu chay, dá»‹ á»©ng thá»±c pháº©m..."
                         />
                       </div>
                     </div>
@@ -807,12 +808,12 @@ export function BanquetPageClient({
                 </div>
               )}
 
-              {/* ── Step 2: Menu Selection ── */}
+              {/* â”€â”€ Step 2: Menu Selection â”€â”€ */}
               {step === 2 && (
                 <div className="p-6">
-                  <h3 className="font-display text-xl text-ink mb-2">Chọn thực đơn</h3>
+                  <h3 className="font-display text-xl text-ink mb-2">Chá»n thá»±c Ä‘Æ¡n</h3>
                   <p className="text-sm text-muted-foreground mb-5">
-                    Chọn set menu có sẵn hoặc tự chọn từng món theo ý muốn
+                    Chá»n set menu cÃ³ sáºµn hoáº·c tá»± chá»n tá»«ng mÃ³n theo Ã½ muá»‘n
                   </p>
 
                   <div className="grid sm:grid-cols-2 gap-3 mb-4">
@@ -837,28 +838,28 @@ export function BanquetPageClient({
                 </div>
               )}
 
-              {/* ── Step 3: Review + Submit ── */}
+              {/* â”€â”€ Step 3: Review + Submit â”€â”€ */}
               {step === 3 && (
                 <div className="p-6">
-                  <h3 className="font-display text-xl text-ink mb-5">Xem lại & Xác nhận</h3>
+                  <h3 className="font-display text-xl text-ink mb-5">Xem láº¡i & XÃ¡c nháº­n</h3>
 
                   <div className="space-y-4">
                     {/* Summary card */}
                     <div className="bg-jade-light rounded-2xl p-5 space-y-3">
                       <div className="flex items-center gap-2 mb-3">
                         <PartyPopper size={18} className="text-jade" />
-                        <span className="font-semibold text-jade">Tóm tắt đặt tiệc</span>
+                        <span className="font-semibold text-jade">TÃ³m táº¯t Ä‘áº·t tiá»‡c</span>
                       </div>
 
                       {[
-                        ["Sự kiện", watch("eventType")],
-                        ["Ngày giờ", watch("eventDate") && watch("eventTime")
-                          ? `${watch("eventDate")} lúc ${watch("eventTime")}`
-                          : "—"],
-                        ["Số khách", `${guestCount} người`],
-                        ["Phòng", rooms.find((r) => r.id === selectedRoomId)?.name ?? "Chưa chọn"],
-                        ["Thực đơn", tier ? `${tier.label} — ${tier.description}` : "Chưa chọn"],
-                        ["Liên hệ", `${watch("customerName")} · ${watch("customerPhone")}`],
+                        ["Sá»± kiá»‡n", watch("eventType")],
+                        ["NgÃ y giá»", watch("eventDate") && watch("eventTime")
+                          ? `${watch("eventDate")} lÃºc ${watch("eventTime")}`
+                          : "â€”"],
+                        ["Sá»‘ khÃ¡ch", `${guestCount} ngÆ°á»i`],
+                        ["PhÃ²ng", rooms.find((r) => r.id === selectedRoomId)?.name ?? "ChÆ°a chá»n"],
+                        ["Thá»±c Ä‘Æ¡n", tier ? `${tier.label} â€” ${tier.description}` : "ChÆ°a chá»n"],
+                        ["LiÃªn há»‡", `${watch("customerName")} Â· ${watch("customerPhone")}`],
                       ].map(([label, value]) => (
                         <div key={label} className="flex justify-between text-sm">
                           <span className="text-muted-foreground">{label}:</span>
@@ -868,7 +869,7 @@ export function BanquetPageClient({
 
                       {estimatedTotal > 0 && (
                         <div className="border-t border-jade/20 pt-3 flex justify-between items-baseline">
-                          <span className="text-sm font-semibold text-jade">Ước tính</span>
+                          <span className="text-sm font-semibold text-jade">Æ¯á»›c tÃ­nh</span>
                           <span className="font-display text-2xl font-bold text-jade price-tag">
                             {formatPrice(estimatedTotal)}
                           </span>
@@ -879,8 +880,8 @@ export function BanquetPageClient({
                     <div className="flex items-start gap-2 bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
                       <Info size={14} className="flex-shrink-0 mt-0.5" />
                       <p>
-                        Đây là báo giá ước tính. Nhân viên sẽ liên hệ xác nhận chính thức
-                        và điều chỉnh menu theo yêu cầu trong vòng 2 giờ.
+                        ÄÃ¢y lÃ  bÃ¡o giÃ¡ Æ°á»›c tÃ­nh. NhÃ¢n viÃªn sáº½ liÃªn há»‡ xÃ¡c nháº­n chÃ­nh thá»©c
+                        vÃ  Ä‘iá»u chá»‰nh menu theo yÃªu cáº§u trong vÃ²ng 2 giá».
                       </p>
                     </div>
                   </div>
@@ -895,7 +896,7 @@ export function BanquetPageClient({
                     onClick={() => setStep((s) => (s - 1) as 1 | 2 | 3)}
                     className="flex-1 py-3 text-sm font-medium border border-[rgb(var(--border))] rounded-2xl bg-white hover:bg-gray-50 transition-colors"
                   >
-                    ← Quay lại
+                    â† Quay láº¡i
                   </button>
                 )}
 
@@ -905,7 +906,7 @@ export function BanquetPageClient({
                     onClick={() => setStep((s) => (s + 1) as 1 | 2 | 3)}
                     className="flex-1 py-3 text-sm font-semibold bg-jade text-white rounded-2xl hover:bg-jade-mid transition-colors shadow-sm"
                   >
-                    Tiếp theo →
+                    Tiáº¿p theo â†’
                   </button>
                 ) : (
                   <button
@@ -916,12 +917,12 @@ export function BanquetPageClient({
                     {isSubmitting ? (
                       <>
                         <Loader2 size={15} className="animate-spin" />
-                        Đang gửi...
+                        Äang gá»­i...
                       </>
                     ) : (
                       <>
                         <CheckCircle2 size={15} />
-                        Gửi yêu cầu đặt tiệc
+                        Gá»­i yÃªu cáº§u Ä‘áº·t tiá»‡c
                       </>
                     )}
                   </button>
@@ -934,9 +935,10 @@ export function BanquetPageClient({
 
       {/* Modern Footer */}
       <footer className="mt-20 py-8 border-t border-[rgb(var(--border))] text-center text-sm text-muted-foreground bg-white">
-        <p>📞 098.648.2222 · 📍 Tân Lập 04, Phường Tích Lương, Thái Nguyên · 🕙 10:00 – 22:00</p>
-        <p className="mt-2">© 2024 Phương Anh Banquet. All rights reserved.</p>
+        <p>ðŸ“ž 098.648.2222 Â· ðŸ“ TÃ¢n Láº­p 04, PhÆ°á»ng TÃ­ch LÆ°Æ¡ng, ThÃ¡i NguyÃªn Â· ðŸ•™ 10:00 â€“ 22:00</p>
+        <p className="mt-2">Â© {new Date().getFullYear()} PhÆ°Æ¡ng Anh Banquet. All rights reserved.</p>
       </footer>
     </>
   );
 }
+

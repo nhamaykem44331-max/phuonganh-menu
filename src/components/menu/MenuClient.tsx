@@ -123,7 +123,7 @@ export function MenuClient({ categories, menuItems, banners }: MenuClientProps) 
           <p className="text-sm text-charcoal/50 mb-8 font-light italic">
             Tìm thấy{" "}
             <span className="font-medium text-navy">{filteredItems.length}</span>{" "}
-            tuyệt tác cho <em>"{searchQuery}"</em>
+            tuyệt tác cho <em>&quot;{searchQuery}&quot;</em>
           </p>
         )}
 

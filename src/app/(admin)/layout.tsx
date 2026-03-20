@@ -2,6 +2,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { AdminSidebar } from "@/components/admin/AdminSidebar";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminRootLayout({
   children,
 }: {

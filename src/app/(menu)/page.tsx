@@ -1,5 +1,5 @@
-// src/app/(menu)/page.tsx
-// Web 1 — Trang thực đơn chính (SSR + Client interactivity)
+﻿// src/app/(menu)/page.tsx
+// Web 1 â€” Trang thá»±c Ä‘Æ¡n chÃ­nh (SSR + Client interactivity)
 
 import { Suspense } from "react";
 import { prisma } from "@/lib/prisma";
@@ -10,7 +10,9 @@ import { CartFloatButton } from "@/components/menu/CartFloatButton";
 
 import { unstable_cache } from "next/cache";
 
-// Fetch dữ liệu trên server — Cache + Revalidate
+export const dynamic = "force-dynamic";
+
+// Fetch dá»¯ liá»‡u trÃªn server â€” Cache + Revalidate
 const getMenuData = unstable_cache(
   async () => {
     const [categories, menuItems, banners] = await Promise.all([
@@ -76,10 +78,10 @@ export default async function MenuPage() {
         />
       </Suspense>
 
-      {/* Floating cart button — fixed position bottom bar */}
+      {/* Floating cart button â€” fixed position bottom bar */}
       <CartFloatButton />
 
-      {/* Cart drawer — slides from right */}
+      {/* Cart drawer â€” slides from right */}
       <CartDrawer />
     </div>
   );
@@ -104,3 +106,5 @@ function MenuSkeleton() {
     </div>
   );
 }
+
+

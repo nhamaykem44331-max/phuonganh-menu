@@ -614,7 +614,7 @@ export function MenuManagerClient({ initialItems, categories }: MenuManagerClien
 
   // Derived states
   const filtered = useMemo(() => {
-    let result = items.filter((item) => {
+    const result = items.filter((item) => {
       const matchCat = filterCat === "all" || item.categoryId === filterCat;
       const matchStatus = filterStatus === "all" ? true : (filterStatus === "active" ? item.isAvailable : !item.isAvailable);
       const matchSearch =

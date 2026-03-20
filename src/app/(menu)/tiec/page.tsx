@@ -1,14 +1,16 @@
-// src/app/(menu)/tiec/page.tsx
-// Web 1 — Trang đặt tiệc & sự kiện (public)
+﻿// src/app/(menu)/tiec/page.tsx
+// Web 1 â€” Trang Ä‘áº·t tiá»‡c & sá»± kiá»‡n (public)
 
 import { prisma } from "@/lib/prisma";
 import { BanquetPageClient } from "@/components/banquet/BanquetPageClient";
 import { MenuHeader } from "@/components/menu/MenuHeader";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
-  title: "Đặt tiệc & Sự kiện | Nhà hàng Phương Anh",
+  title: "Äáº·t tiá»‡c & Sá»± kiá»‡n | NhÃ  hÃ ng PhÆ°Æ¡ng Anh",
   description:
-    "Đặt tiệc cưới, sinh nhật, hội nghị tại Nhà hàng Phương Anh Thái Nguyên. Sảnh sang trọng, menu đa dạng, phục vụ chuyên nghiệp.",
+    "Äáº·t tiá»‡c cÆ°á»›i, sinh nháº­t, há»™i nghá»‹ táº¡i NhÃ  hÃ ng PhÆ°Æ¡ng Anh ThÃ¡i NguyÃªn. Sáº£nh sang trá»ng, menu Ä‘a dáº¡ng, phá»¥c vá»¥ chuyÃªn nghiá»‡p.",
 };
 
 async function getData() {
@@ -47,3 +49,5 @@ export default async function BanquetPage() {
     </div>
   );
 }
+
+

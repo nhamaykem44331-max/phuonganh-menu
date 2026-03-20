@@ -1,9 +1,10 @@
-// src/app/api/rooms/route.ts
-// Public API — Danh sách phòng / sảnh tiệc
+﻿// src/app/api/rooms/route.ts
+// Public API â€” Danh sÃ¡ch phÃ²ng / sáº£nh tiá»‡c
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 600;
 
 export async function GET() {
@@ -30,6 +31,7 @@ export async function GET() {
       })),
     });
   } catch {
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json({ error: "Lá»—i server" }, { status: 500 });
   }
 }
+

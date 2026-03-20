@@ -1,10 +1,11 @@
-// src/app/api/categories/route.ts
-// Public API — Danh sách danh mục
+﻿// src/app/api/categories/route.ts
+// Public API â€” Danh sÃ¡ch danh má»¥c
 
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 
-export const revalidate = 600; // Cache 10 phút
+export const dynamic = "force-dynamic";
+export const revalidate = 600; // Cache 10 phÃºt
 
 export async function GET() {
   try {
@@ -26,6 +27,8 @@ export async function GET() {
       })),
     });
   } catch {
-    return NextResponse.json({ error: "Lỗi server" }, { status: 500 });
+    return NextResponse.json({ error: "Lá»—i server" }, { status: 500 });
   }
 }
+
+
