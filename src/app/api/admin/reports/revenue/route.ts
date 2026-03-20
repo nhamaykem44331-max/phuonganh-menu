@@ -1,11 +1,18 @@
-// src/app/api/admin/reports/revenue/route.ts
-// Admin API - Báo cáo doanh thu
+﻿// src/app/api/admin/reports/revenue/route.ts
+// Admin API - Revenue reports
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
+
+function toVnHour(date: Date): number {
+  const vnDate = new Date(
+    date.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+  );
+  return vnDate.getHours();
+}
 
 export async function GET(request: NextRequest) {
   try {
@@ -16,10 +23,9 @@ export async function GET(request: NextRequest) {
     const fromParam = searchParams.get("from");
     const toParam = searchParams.get("to");
 
-    // Tính khoảng thời gian
     const now = new Date();
     let startDate: Date;
-    let endDate: Date = new Date(now);
+    let endDate = new Date(now);
     endDate.setHours(23, 59, 59, 999);
 
     if (fromParam && toParam) {
@@ -46,15 +52,7 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Query song song để tối ưu tốc độ
-    const [
-      orders,
-      totalRevenue,
-      orderCount,
-      topItems,
-      hourlyStats,
-    ] = await Promise.all([
-      // Đơn hàng gần đây
+    const [orders, totalRevenue, orderCount, topItems, hourlyRows] = await Promise.all([
       prisma.order.findMany({
         where: {
           createdAt: { gte: startDate, lte: endDate },
@@ -69,7 +67,6 @@ export async function GET(request: NextRequest) {
         take: 20,
       }),
 
-      // Tổng doanh thu
       prisma.order.aggregate({
         where: {
           createdAt: { gte: startDate, lte: endDate },
@@ -80,14 +77,12 @@ export async function GET(request: NextRequest) {
         _avg: { total: true },
       }),
 
-      // Đếm theo trạng thái
       prisma.order.groupBy({
         by: ["status"],
         where: { createdAt: { gte: startDate, lte: endDate } },
         _count: true,
       }),
 
-      // Top món bán chạy
       prisma.orderItem.groupBy({
         by: ["menuItemId"],
         where: {
@@ -101,24 +96,21 @@ export async function GET(request: NextRequest) {
         take: 10,
       }),
 
-      // Thống kê theo giờ trong ngày (chỉ cho today)
       period === "today"
-        ? prisma.$queryRaw<Array<{ hour: number; count: number; revenue: number }>>`
-            SELECT 
-              EXTRACT(HOUR FROM created_at AT TIME ZONE 'Asia/Ho_Chi_Minh')::int as hour,
-              COUNT(*)::int as count,
-              COALESCE(SUM(total), 0)::float as revenue
-            FROM orders
-            WHERE created_at >= ${startDate}
-              AND created_at <= ${endDate}
-              AND status != 'CANCELLED'
-            GROUP BY hour
-            ORDER BY hour
-          `
+        ? prisma.order.findMany({
+            where: {
+              createdAt: { gte: startDate, lte: endDate },
+              status: { not: "CANCELLED" },
+            },
+            select: {
+              createdAt: true,
+              total: true,
+            },
+            orderBy: { createdAt: "asc" },
+          })
         : Promise.resolve([]),
     ]);
 
-    // Lấy tên món cho top items
     const menuItemIds = topItems.map((i) => i.menuItemId);
     const menuItems = await prisma.menuItem.findMany({
       where: { id: { in: menuItemIds } },
@@ -132,11 +124,33 @@ export async function GET(request: NextRequest) {
       revenue: Number(item._sum.subtotal ?? 0),
     }));
 
-    // Thống kê trạng thái đơn
     const statusMap: Record<string, number> = {};
     orderCount.forEach((s) => {
       statusMap[s.status] = s._count;
     });
+
+    const hourlyStats =
+      period === "today"
+        ? Array.from(
+            hourlyRows.reduce<Map<number, { count: number; revenue: number }>>(
+              (acc, row) => {
+                const hour = toVnHour(row.createdAt);
+                const current = acc.get(hour) ?? { count: 0, revenue: 0 };
+                current.count += 1;
+                current.revenue += Number(row.total);
+                acc.set(hour, current);
+                return acc;
+              },
+              new Map()
+            )
+          )
+            .map(([hour, value]) => ({
+              hour,
+              count: value.count,
+              revenue: value.revenue,
+            }))
+            .sort((a, b) => a.hour - b.hour)
+        : [];
 
     return NextResponse.json({
       success: true,

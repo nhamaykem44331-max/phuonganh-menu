@@ -30,6 +30,21 @@ function getPeriodRange(period: string) {
   return { start, end };
 }
 
+function toVnDayKey(date: Date): string {
+  const vnDate = new Date(
+    date.toLocaleString("en-US", { timeZone: "Asia/Ho_Chi_Minh" })
+  );
+  const yyyy = vnDate.getFullYear();
+  const mm = String(vnDate.getMonth() + 1).padStart(2, "0");
+  const dd = String(vnDate.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function formatDayKey(dayKey: string): string {
+  const [yyyy, mm, dd] = dayKey.split("-");
+  return `${dd}/${mm}/${yyyy}`;
+}
+
 export default async function AdminReportsPage({
   searchParams,
 }: {
@@ -44,7 +59,7 @@ export default async function AdminReportsPage({
   from.setHours(0, 0, 0, 0);
   to.setHours(23, 59, 59, 999);
 
-  const [paidAgg, allOrders, statusGroup, topItemsRaw, dailyRaw, recentOrders] = await Promise.all([
+  const [paidAgg, allOrders, statusGroup, topItemsRaw, dailyRows, recentOrders] = await Promise.all([
     prisma.order.aggregate({
       where: {
         createdAt: { gte: from, lte: to },
@@ -77,18 +92,17 @@ export default async function AdminReportsPage({
       orderBy: { _sum: { quantity: "desc" } },
       take: 8,
     }),
-    prisma.$queryRaw<Array<{ day: Date; orders: number; revenue: number }>>`
-      SELECT 
-        DATE(created_at) as day,
-        COUNT(*)::int as orders,
-        COALESCE(SUM(total), 0)::float as revenue
-      FROM orders
-      WHERE created_at >= ${from}
-        AND created_at <= ${to}
-        AND status != 'CANCELLED'
-      GROUP BY day
-      ORDER BY day ASC
-    `,
+    prisma.order.findMany({
+      where: {
+        createdAt: { gte: from, lte: to },
+        status: { not: "CANCELLED" },
+      },
+      select: {
+        createdAt: true,
+        total: true,
+      },
+      orderBy: { createdAt: "asc" },
+    }),
     prisma.order.findMany({
       where: { createdAt: { gte: from, lte: to } },
       orderBy: { createdAt: "desc" },
@@ -115,6 +129,19 @@ export default async function AdminReportsPage({
     acc[curr.status] = curr._count;
     return acc;
   }, {});
+
+  const dayMap = new Map<string, { orders: number; revenue: number }>();
+  for (const row of dailyRows) {
+    const key = toVnDayKey(row.createdAt);
+    const current = dayMap.get(key) ?? { orders: 0, revenue: 0 };
+    current.orders += 1;
+    current.revenue += Number(row.total);
+    dayMap.set(key, current);
+  }
+
+  const dailyRaw = Array.from(dayMap.entries())
+    .map(([day, value]) => ({ day, orders: value.orders, revenue: value.revenue }))
+    .sort((a, b) => a.day.localeCompare(b.day));
 
   const totalRevenue = Number(paidAgg._sum.total ?? 0);
   const avgOrderValue = Number(paidAgg._avg.total ?? 0);
@@ -164,13 +191,9 @@ export default async function AdminReportsPage({
             {dailyRaw.map((row) => {
               const revenue = Number(row.revenue || 0);
               const widthPercent = totalRevenue > 0 ? Math.max((revenue / totalRevenue) * 100, 4) : 4;
-              const dayText = new Date(row.day).toLocaleDateString("vi-VN", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              });
+              const dayText = formatDayKey(row.day);
               return (
-                <div key={String(row.day)} className="grid grid-cols-[110px_1fr_110px] gap-3 items-center">
+                <div key={row.day} className="grid grid-cols-[110px_1fr_110px] gap-3 items-center">
                   <span className="text-xs text-slate-500">{dayText}</span>
                   <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
                     <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${widthPercent}%` }} />
